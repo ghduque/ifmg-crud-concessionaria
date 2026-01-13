@@ -17,7 +17,11 @@
             
             <div class="col-md-6 col-lg-4 text-white p-5 login-card">
                 <h4 class="text-uppercase ls-2 mb-3 text-secondary">Bem-vindo</h4>
-                <h1 class="display-4 fw-bold mb-4">AUTO<span class="text-primary">NÍVEL</span></h1>
+                
+                <h1 class="display-4 fw-bold mb-4">
+                    <span class="text-primary">AUTO</span>NÍVEL
+                </h1>
+                
                 <p class="mb-5 lead">A excelência em veículos que você procura. Faça login para gerenciar o estoque.</p>
                 
                 <?php if (isset($erro)): ?>
@@ -38,13 +42,18 @@
                     <button type="submit" class="btn btn-primary w-100 py-3 text-uppercase fw-bold mt-3">Entrar no Sistema</button>
                     
                     <div class="mt-4 text-center">
-                        <p class="mb-2 text-white-50 small">Ainda não tem acesso?</p>
-                        <a href="/cadastro" class="btn btn-outline-light w-100 text-uppercase fw-bold" style="font-size: 0.8rem;">Criar Conta Agora</a>
+                        <p class="mb-2 text-white-50 small">Esqueci minha senha</p>
+                        
+                        <a href="/cadastro" class="btn btn-outline-light w-100 text-uppercase fw-bold" style="font-size: 0.8rem;">CRIAR CONTA AGORA</a>
                     </div>
 
                     <div class="mt-3 text-center">
-                        <a href="/" class="text-white-50 text-decoration-none small" style="opacity: 0.5;">← Voltar ao site</a>
+                        <a href="/veiculos" class="text-white-50 text-decoration-none small" style="opacity: 0.5;">
+                            ← Voltar para o Loja
+                        </a>
                     </div>
+                </form>
+            </div>
                 </form>
             </div>
 
