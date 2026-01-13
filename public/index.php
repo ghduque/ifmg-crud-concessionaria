@@ -11,8 +11,8 @@ $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 switch ($url) {
     case '/':
-        $controller = new VeiculoController();
-        $controller->index();
+        $controller = new UsuarioController();
+        $controller->login();
         break;
 
     case '/veiculos':
@@ -51,6 +51,16 @@ switch ($url) {
     case '/logout':
         $controller = new UsuarioController();
         $controller->logout();
+        break;
+    
+    case '/cadastro':
+        $controller = new UsuarioController();
+        $controller->cadastro();
+        break;
+
+    case '/cadastro/salvar':
+        $controller = new UsuarioController();
+        $controller->salvar();
         break;
 
     default:

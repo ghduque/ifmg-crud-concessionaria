@@ -1,0 +1,185 @@
+/* =========================================
+   TEMA AMARELO E PRETO - AUTONÍVEL
+   ========================================= */
+
+/* Fonte mais moderna */
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #121212; /* Fundo preto caso a imagem não carregue */
+}
+
+/* --- Configuração da Página de Login Tela Cheia --- */
+.login-page {
+    /* Mantemos a imagem do carro escuro, pois combina com o tema */
+    background-image: url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1920&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Camada preta transparente mais intensa para destacar o amarelo */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Gradiente reforçando o preto na esquerda onde está o texto */
+    background: linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 100%);
+    z-index: 1;
+}
+
+/* --- Estilização do Cartão de Login --- */
+.login-card {
+    /* Borda direita sutilmente amarela */
+    border-right: 2px solid rgba(244, 208, 63, 0.5);
+}
+
+.ls-2 {
+    letter-spacing: 2px;
+}
+
+/* --- SUBSTITUIÇÃO DE CORES (Overriding Bootstrap) --- */
+
+/* Definindo a cor Amarela Principal */
+:root {
+    --tema-amarelo: #F4D03F;
+    --tema-amarelo-escuro: #d4b42e;
+}
+
+/* Força o texto que usava "text-primary" (azul) a ficar amarelo */
+.text-primary {
+    color: var(--tema-amarelo) !important;
+}
+
+/* Força os rótulos (labels) a ficarem amarelos também */
+.login-card .form-label {
+    color: var(--tema-amarelo) !important;
+    font-weight: 600;
+}
+
+
+/* --- Inputs Customizados (Escuros com foco Amarelo) --- */
+.form-control-dark {
+    background-color: rgba(0, 0, 0, 0.5); /* Fundo mais preto */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Borda sutil inicial */
+    color: #fff;
+    border-radius: 0; /* Bordas quadradas */
+    padding: 15px;
+    transition: all 0.3s;
+}
+
+.form-control-dark:focus {
+    background-color: rgba(0, 0, 0, 0.8);
+    border-color: var(--tema-amarelo); /* Borda AMARELA no foco */
+    color: var(--tema-amarelo); /* Texto digitado fica amarelo */
+    box-shadow: 0 0 15px rgba(244, 208, 63, 0.3); /* Brilho amarelo */
+}
+
+.form-control-dark::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+
+/* --- Botão Principal (Amarelo com texto Preto) --- */
+.btn-primary {
+    border-radius: 0;
+    background-color: var(--tema-amarelo);
+    color: #000; /* Texto preto para contraste máximo */
+    font-weight: 800; /* Texto mais grosso */
+    border: none;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+    background-color: var(--tema-amarelo-escuro) !important;
+    color: #000 !important;
+    transform: translateY(-3px) scale(1.02); /* Efeito de "pulo" maior */
+    box-shadow: 0 10px 20px -10px rgba(244, 208, 63, 0.5); /* Sombra amarela */
+}
+
+/* Ajuste no link "Voltar ao site" para ficar amarelado no hover */
+.login-card a.text-white-50:hover {
+    color: var(--tema-amarelo) !important;
+}
+
+/* --- NAVBAR & LOGO --- */
+.navbar {
+    background-color: #000 !important; /* Preto absoluto no topo */
+    border-bottom: 1px solid #333;
+    padding: 15px 0;
+}
+
+.navbar-brand img {
+    max-height: 50px; /* Ajuste conforme necessário para a logo não estourar */
+    width: auto;
+}
+
+.nav-link {
+    color: #fff !important;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    transition: color 0.3s;
+}
+
+.nav-link:hover {
+    color: var(--tema-amarelo) !important;
+}
+
+/* --- CARD DE VEÍCULO (PREMIUM) --- */
+.card-veiculo {
+    background-color: #1a1a1a; /* Cinza muito escuro */
+    border: none;
+    transition: transform 0.3s, box-shadow 0.3s;
+    height: 100%;
+}
+
+.card-veiculo:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border-bottom: 3px solid var(--tema-amarelo);
+}
+
+.card-img-wrapper {
+    position: relative;
+    overflow: hidden;
+    height: 220px;
+}
+
+.card-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+}
+
+.card-veiculo:hover .card-img-wrapper img {
+    transform: scale(1.1); /* Zoom suave na foto ao passar o mouse */
+}
+
+.card-price {
+    color: var(--tema-amarelo);
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.card-title {
+    color: #fff;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.card-info {
+    color: #aaa;
+    font-size: 0.9rem;
+    border-top: 1px solid #333;
+    padding-top: 10px;
+    margin-top: 10px;
+}
