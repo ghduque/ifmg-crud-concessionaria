@@ -36,11 +36,35 @@
                     
                     <div class="row">
                         <div class="col-md-6 mb-4">
+                            <label class="form-label text-uppercase small text-secondary">CPF</label>
+                            <input type="text" 
+                                name="cpf" 
+                                class="form-control form-control-dark" 
+                                placeholder="000.000.000-00" 
+                                maxlength="14"
+                                oninput="mascaraCPF(this)"
+                                required>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label text-uppercase small text-secondary">Telefone</label>
+                            <input type="text" 
+                                name="telefone" 
+                                class="form-control form-control-dark" 
+                                placeholder="(00) 00000-0000" 
+                                maxlength="15"
+                                oninput="mascaraTelefone(this)"
+                                required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
                             <label class="form-label text-uppercase small text-secondary">Senha</label>
                             <input type="password" name="senha" class="form-control form-control-dark" placeholder="******" required>
                         </div>
                         <div class="col-md-6 mb-4">
-                            <label class="form-label text-uppercase small text-secondary">Confirmar</label>
+                            <label class="form-label text-uppercase small text-secondary">Confirmar Senha</label>
                             <input type="password" name="confirmar_senha" class="form-control form-control-dark" placeholder="******" required>
                         </div>
                     </div>
@@ -56,7 +80,7 @@
 
         </div>
     </div>
-
+    <script src="/js/main.js"></script>
 </body>
 
 </html>

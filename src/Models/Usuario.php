@@ -20,13 +20,15 @@ class Usuario {
     }
 
     // Método extra: Criar usuário (útil para criar o primeiro admin via código)
-    public function criar($nome, $email, $senha, $papel = 'comum') {
+    public function criar($nome, $email,$cpf, $telefone, $senha, $papel = 'comum') {
         $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
         
-        $query = "INSERT INTO usuarios (nome, email, senha_hash, papel) VALUES (:nome, :email, :senha, :papel)";
+        $query = "INSERT INTO usuarios (nome, email, cpf, telefone, senha_hash, papel) VALUES (:nome, :email, :cpf, :telefone, :senha, :papel)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':nome', $nome);
         $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':cpf', $cpf);
+        $stmt->bindParam(':telefone', $telefone);
         $stmt->bindParam(':senha', $senhaHash);
         $stmt->bindParam(':papel', $papel);
         

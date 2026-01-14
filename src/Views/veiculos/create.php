@@ -18,24 +18,26 @@
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label>Ano Fab.</label>
-                            <input type="number" name="ano_fabricacao" class="form-control" required>
+                   <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Ano Fab.</label>
+                            <input type="number" name="ano_fabricacao" class="form-control" required placeholder="Ex: 2020">
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label>Ano Mod.</label>
-                            <input type="number" name="ano_modelo" class="form-control" required>
+                        
+                        <div class="col-md-3">
+                            <label class="form-label">Ano Mod.</label>
+                            <input type="number" name="ano_modelo" class="form-control" required placeholder="Ex: 2021">
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label>Valor (R$)</label>
-                            <input type="number" step="0.01" name="valor" class="form-control" required>
+                        
+                        <div class="col-md-3">
+                            <label class="form-label">Quilometragem (Km)</label>
+                            <input type="number" name="km" class="form-control" required placeholder="Ex: 50000">
                         </div>
-                    </div>
 
-                    <div class="mb-3">
-                        <label>Descrição</label>
-                        <textarea name="descricao" class="form-control" rows="3"></textarea>
+                        <div class="col-md-3">
+                            <label class="form-label">Valor (R$)</label>
+                            <input type="number" step="0.01" name="valor" class="form-control" required placeholder="0,00">
+                        </div>
                     </div>
 
                     <div class="mb-3">

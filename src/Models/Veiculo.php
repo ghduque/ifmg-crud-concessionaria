@@ -9,9 +9,9 @@ class Veiculo {
         $this->conn = $database->getConnection();
     }
 
-    // Lista todos os veículos trazendo a foto de capa (se houver)
+    // Lista todos os veículos trazendo a foto de capa
     public function listarTodos() {
-        // DISTINCT ON (v.id) é um recurso top do PostgreSQL para evitar duplicatas
+        // O "v.*" já vai trazer a coluna 'km' automaticamente, pois adicionamos ela no banco
         $query = "SELECT DISTINCT ON (v.id) v.*, f.url_foto 
                   FROM veiculos v 
                   LEFT JOIN veiculos_fotos f ON v.id = f.veiculo_id 
@@ -22,14 +22,15 @@ class Veiculo {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Cadastra veículo e foto numa transação única
-    public function cadastrar($marca, $modelo, $ano_fab, $ano_mod, $valor, $descricao, $caminhoFoto) {
+    // --- AQUI ESTÁ A ALTERAÇÃO ---
+    // Adicionei $km na lista de itens que a função recebe
+    public function cadastrar($marca, $modelo, $ano_fab, $ano_mod, $valor, $km, $descricao, $caminhoFoto) {
         try {
-            $this->conn->beginTransaction(); // Inicia transação
+            $this->conn->beginTransaction();
 
-            // 1. Insere o Veículo
-            $query = "INSERT INTO veiculos (marca, modelo, ano_fabricacao, ano_modelo, valor, descricao) 
-                      VALUES (:marca, :modelo, :ano_fab, :ano_mod, :valor, :descricao) RETURNING id";
+            // 1. Insere o Veículo (Adicionei 'km' aqui)
+            $query = "INSERT INTO veiculos (marca, modelo, ano_fabricacao, ano_modelo, valor, km, descricao) 
+                      VALUES (:marca, :modelo, :ano_fab, :ano_mod, :valor, :km, :descricao) RETURNING id";
             
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':marca', $marca);
@@ -37,10 +38,10 @@ class Veiculo {
             $stmt->bindParam(':ano_fab', $ano_fab);
             $stmt->bindParam(':ano_mod', $ano_mod);
             $stmt->bindParam(':valor', $valor);
+            $stmt->bindParam(':km', $km); // <--- NOVO: Liga o valor do KM
             $stmt->bindParam(':descricao', $descricao);
             $stmt->execute();
             
-            // Pega o ID do carro criado
             $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
             $veiculoId = $resultado['id'];
 
@@ -53,16 +54,15 @@ class Veiculo {
                 $stmtFoto->execute();
             }
 
-            $this->conn->commit(); // Salva tudo
+            $this->conn->commit();
             return true;
 
         } catch (Exception $e) {
-            $this->conn->rollBack(); // Se der erro, cancela tudo
+            $this->conn->rollBack();
             return false;
         }
     }
 
-    // Atualiza o status (Disponível -> Vendido)
     public function alterarStatus($id, $novoStatus) {
         $query = "UPDATE veiculos SET status = :status WHERE id = :id";
         $stmt = $this->conn->prepare($query);
@@ -71,12 +71,82 @@ class Veiculo {
         return $stmt->execute();
     }
 
-    // Deleta o veículo (O banco já apaga as fotos por causa do CASCADE)
     public function deletar($id) {
         $query = "DELETE FROM veiculos WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id);
         return $stmt->execute();
+    }
+    // Busca um único veículo pelo ID (para preencher o formulário de edição)
+    public function buscarPorId($id) {
+        $query = "SELECT v.*, f.url_foto 
+                  FROM veiculos v 
+                  LEFT JOIN veiculos_fotos f ON v.id = f.veiculo_id 
+                  WHERE v.id = :id 
+                  LIMIT 1";
+                  
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    // Busca todas as fotos de um veículo específico
+    public function buscarFotos($veiculoId) {
+        $query = "SELECT url_foto FROM veiculos_fotos WHERE veiculo_id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $veiculoId);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Atualiza os dados do veículo
+    public function atualizar($id, $marca, $modelo, $ano_fab, $ano_mod, $valor, $km, $descricao, $novaFoto = null) {
+        try {
+            $this->conn->beginTransaction();
+
+            // 1. Atualiza os dados principais
+            $query = "UPDATE veiculos 
+                      SET marca = :marca, modelo = :modelo, ano_fabricacao = :ano_fab, 
+                          ano_modelo = :ano_mod, valor = :valor, km = :km, descricao = :descricao 
+                      WHERE id = :id";
+            
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':marca', $marca);
+            $stmt->bindParam(':modelo', $modelo);
+            $stmt->bindParam(':ano_fab', $ano_fab);
+            $stmt->bindParam(':ano_mod', $ano_mod);
+            $stmt->bindParam(':valor', $valor);
+            $stmt->bindParam(':km', $km);
+            $stmt->bindParam(':descricao', $descricao);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+
+            // 2. Se enviou uma nova foto, atualiza a tabela de fotos
+            if ($novaFoto) {
+                // Primeiro tenta atualizar se já existir
+                $queryFoto = "UPDATE veiculos_fotos SET url_foto = :url WHERE veiculo_id = :id";
+                $stmtFoto = $this->conn->prepare($queryFoto);
+                $stmtFoto->bindParam(':url', $novaFoto);
+                $stmtFoto->bindParam(':id', $id);
+                $stmtFoto->execute();
+
+                // Se não atualizou nenhuma linha (não tinha foto antes), insere uma nova
+                if ($stmtFoto->rowCount() == 0) {
+                    $queryInsert = "INSERT INTO veiculos_fotos (veiculo_id, url_foto, destaque) VALUES (:id, :url, true)";
+                    $stmtInsert = $this->conn->prepare($queryInsert);
+                    $stmtInsert->bindParam(':id', $id);
+                    $stmtInsert->bindParam(':url', $novaFoto);
+                    $stmtInsert->execute();
+                }
+            }
+
+            $this->conn->commit();
+            return true;
+
+        } catch (Exception $e) {
+            $this->conn->rollBack();
+            return false;
+        }
     }
 }
 ?>

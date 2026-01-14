@@ -150,11 +150,19 @@
                                         <span><i class="fas fa-map-marker-alt me-1"></i> MG</span>
                                     </div>
 
-                                    <a href="#" class="btn btn-outline-primary w-100 mt-3 btn-sm text-uppercase fw-bold">Ver Oferta</a>
+                                    <a href="/veiculos/detalhes?id=<?= $carro['id'] ?>" class="btn btn-outline-primary w-100 mt-3 btn-sm text-uppercase fw-bold">Ver Oferta</a>
 
                                     <?php if (isset($_SESSION['papel']) && $_SESSION['papel'] === 'admin'): ?>
-                                        <div class="mt-2 d-flex gap-1">
-                                            <a href="/veiculos/delete?id=<?= $carro['id'] ?>" class="btn btn-sm btn-danger flex-fill" onclick="return confirm('Excluir?')"><i class="fas fa-trash"></i></a>
+                                        <div class="mt-2 d-flex gap-2">
+                                            
+                                            <a href="/veiculos/edit?id=<?= $carro['id'] ?>" class="btn btn-sm btn-warning flex-fill fw-bold text-dark" title="Editar Veículo">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            
+                                            <a href="/veiculos/delete?id=<?= $carro['id'] ?>" class="btn btn-sm btn-danger flex-fill" onclick="return confirm('Tem certeza que deseja excluir este veículo?')" title="Excluir Veículo">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                            
                                         </div>
                                     <?php endif; ?>
                                 </div>
