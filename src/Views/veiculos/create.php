@@ -40,9 +40,14 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label>Foto Principal</label>
-                        <input type="file" name="foto" class="form-control" accept="image/*">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase">Fotos do Veículo</label>
+
+                        <div class="input-group">
+                            <input type="file" name="fotos[]" class="form-control" id="inputFotos" multiple accept="image/*">
+                            <label class="input-group-text" for="inputFotos">Selecionar</label>
+                        </div>
+                        <div class="form-text">Segure a tecla <b>Ctrl</b> para selecionar várias fotos de uma vez.</div>
                     </div>
 
                     <button type="submit" class="btn btn-success w-100">Salvar Veículo</button>

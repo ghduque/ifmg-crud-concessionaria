@@ -11,24 +11,24 @@ class Veiculo {
 
     // Lista todos os veículos trazendo a foto de capa
     public function listarTodos() {
-        // O "v.*" já vai trazer a coluna 'km' automaticamente, pois adicionamos ela no banco
+        // Traz apenas a foto definida como destaque ou a primeira encontrada
         $query = "SELECT DISTINCT ON (v.id) v.*, f.url_foto 
                   FROM veiculos v 
                   LEFT JOIN veiculos_fotos f ON v.id = f.veiculo_id 
-                  ORDER BY v.id DESC";
+                  ORDER BY v.id DESC, f.destaque DESC";
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // --- AQUI ESTÁ A ALTERAÇÃO ---
-    // Adicionei $km na lista de itens que a função recebe
-    public function cadastrar($marca, $modelo, $ano_fab, $ano_mod, $valor, $km, $descricao, $caminhoFoto) {
+    // --- MÉTODO ATUALIZADO PARA MÚLTIPLAS FOTOS ---
+    // Recebe um array $fotos em vez de uma string única
+    public function cadastrar($marca, $modelo, $ano_fab, $ano_mod, $valor, $km, $descricao, $fotos = []) {
         try {
             $this->conn->beginTransaction();
 
-            // 1. Insere o Veículo (Adicionei 'km' aqui)
+            // 1. Insere o Veículo
             $query = "INSERT INTO veiculos (marca, modelo, ano_fabricacao, ano_modelo, valor, km, descricao) 
                       VALUES (:marca, :modelo, :ano_fab, :ano_mod, :valor, :km, :descricao) RETURNING id";
             
@@ -38,20 +38,27 @@ class Veiculo {
             $stmt->bindParam(':ano_fab', $ano_fab);
             $stmt->bindParam(':ano_mod', $ano_mod);
             $stmt->bindParam(':valor', $valor);
-            $stmt->bindParam(':km', $km); // <--- NOVO: Liga o valor do KM
+            $stmt->bindParam(':km', $km);
             $stmt->bindParam(':descricao', $descricao);
             $stmt->execute();
             
             $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
             $veiculoId = $resultado['id'];
 
-            // 2. Se tiver foto, insere na tabela auxiliar
-            if ($caminhoFoto) {
-                $queryFoto = "INSERT INTO veiculos_fotos (veiculo_id, url_foto, destaque) VALUES (:id, :url, true)";
+            // 2. Loop para inserir TODAS as fotos enviadas
+            if (!empty($fotos) && is_array($fotos)) {
+                $queryFoto = "INSERT INTO veiculos_fotos (veiculo_id, url_foto, destaque) VALUES (:id, :url, :destaque)";
                 $stmtFoto = $this->conn->prepare($queryFoto);
-                $stmtFoto->bindParam(':id', $veiculoId);
-                $stmtFoto->bindParam(':url', $caminhoFoto);
-                $stmtFoto->execute();
+
+                foreach ($fotos as $index => $urlFoto) {
+                    // A primeira foto (index 0) será o destaque/capa
+                    $destaque = ($index === 0) ? 'true' : 'false';
+                    
+                    $stmtFoto->bindParam(':id', $veiculoId);
+                    $stmtFoto->bindParam(':url', $urlFoto);
+                    $stmtFoto->bindParam(':destaque', $destaque);
+                    $stmtFoto->execute();
+                }
             }
 
             $this->conn->commit();
@@ -77,29 +84,33 @@ class Veiculo {
         $stmt->bindParam(':id', $id);
         return $stmt->execute();
     }
-    // Busca um único veículo pelo ID (para preencher o formulário de edição)
+
+    // Busca um único veículo pelo ID
     public function buscarPorId($id) {
         $query = "SELECT v.*, f.url_foto 
                   FROM veiculos v 
                   LEFT JOIN veiculos_fotos f ON v.id = f.veiculo_id 
                   WHERE v.id = :id 
-                  LIMIT 1";
+                  ORDER BY f.destaque DESC 
+                  LIMIT 1"; // Pega a foto destaque como capa
                   
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-    // Busca todas as fotos de um veículo específico
+
+    // Busca TODAS as fotos de um veículo (Para o Carrossel)
     public function buscarFotos($veiculoId) {
-        $query = "SELECT url_foto FROM veiculos_fotos WHERE veiculo_id = :id";
+        $query = "SELECT url_foto FROM veiculos_fotos WHERE veiculo_id = :id ORDER BY id ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $veiculoId);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Atualiza os dados do veículo
+    // Atualiza os dados do veículo (Edição)
+    // Mantive a lógica original para edição por enquanto (troca a foto principal)
     public function atualizar($id, $marca, $modelo, $ano_fab, $ano_mod, $valor, $km, $descricao, $novaFoto = null) {
         try {
             $this->conn->beginTransaction();
@@ -121,23 +132,20 @@ class Veiculo {
             $stmt->bindParam(':id', $id);
             $stmt->execute();
 
-            // 2. Se enviou uma nova foto, atualiza a tabela de fotos
+            // 2. Se enviou uma nova foto, atualiza a tabela de fotos (substitui capa)
             if ($novaFoto) {
-                // Primeiro tenta atualizar se já existir
-                $queryFoto = "UPDATE veiculos_fotos SET url_foto = :url WHERE veiculo_id = :id";
-                $stmtFoto = $this->conn->prepare($queryFoto);
-                $stmtFoto->bindParam(':url', $novaFoto);
-                $stmtFoto->bindParam(':id', $id);
-                $stmtFoto->execute();
+                // Tira o destaque de todas as fotos anteriores desse carro
+                $queryReset = "UPDATE veiculos_fotos SET destaque = false WHERE veiculo_id = :id";
+                $stmtReset = $this->conn->prepare($queryReset);
+                $stmtReset->bindParam(':id', $id);
+                $stmtReset->execute();
 
-                // Se não atualizou nenhuma linha (não tinha foto antes), insere uma nova
-                if ($stmtFoto->rowCount() == 0) {
-                    $queryInsert = "INSERT INTO veiculos_fotos (veiculo_id, url_foto, destaque) VALUES (:id, :url, true)";
-                    $stmtInsert = $this->conn->prepare($queryInsert);
-                    $stmtInsert->bindParam(':id', $id);
-                    $stmtInsert->bindParam(':url', $novaFoto);
-                    $stmtInsert->execute();
-                }
+                // Insere a nova foto como destaque
+                $queryInsert = "INSERT INTO veiculos_fotos (veiculo_id, url_foto, destaque) VALUES (:id, :url, true)";
+                $stmtInsert = $this->conn->prepare($queryInsert);
+                $stmtInsert->bindParam(':id', $id);
+                $stmtInsert->bindParam(':url', $novaFoto);
+                $stmtInsert->execute();
             }
 
             $this->conn->commit();
@@ -148,9 +156,8 @@ class Veiculo {
             return false;
         }
     }
+
     public function listarComFiltros($filtros) {
-        // 1. Iniciamos a consulta base
-        // Nota: O DISTINCT ON (v.id) exige que o primeiro campo do ORDER BY seja v.id
         $sql = "SELECT DISTINCT ON (v.id) v.*, f.url_foto 
                 FROM veiculos v 
                 LEFT JOIN veiculos_fotos f ON v.id = f.veiculo_id 
@@ -158,13 +165,11 @@ class Veiculo {
         
         $params = [];
 
-        // Filtro de Busca (Marca ou Modelo)
         if (!empty($filtros['busca'])) {
             $sql .= " AND (v.modelo ILIKE :busca OR v.marca ILIKE :busca)";
             $params[':busca'] = '%' . $filtros['busca'] . '%';
         }
 
-        // Filtro de Preço
         if (!empty($filtros['preco_min'])) {
             $sql .= " AND v.valor >= :pmin";
             $params[':pmin'] = $filtros['preco_min'];
@@ -174,7 +179,6 @@ class Veiculo {
             $params[':pmax'] = $filtros['preco_max'];
         }
 
-        // Filtro de Ano
         if (!empty($filtros['ano_min'])) {
             $sql .= " AND v.ano_modelo >= :amin";
             $params[':amin'] = $filtros['ano_min'];
@@ -184,7 +188,6 @@ class Veiculo {
             $params[':amax'] = $filtros['ano_max'];
         }
 
-        // Filtro de KM
         if (!empty($filtros['km_min'])) {
             $sql .= " AND v.km >= :kmin";
             $params[':kmin'] = $filtros['km_min'];
@@ -194,11 +197,7 @@ class Veiculo {
             $params[':kmax'] = $filtros['km_max'];
         }
 
-        // --- CORREÇÃO DA ORDENAÇÃO ---
-        // Para o DISTINCT ON funcionar, o v.id deve vir primeiro no ORDER BY interno.
-        // Mas para o usuário ver a ordem certa, envolvemos tudo em uma subquery.
-        
-        $sqlCompleto = "SELECT * FROM ($sql ORDER BY v.id) AS subquery";
+        $sqlCompleto = "SELECT * FROM ($sql ORDER BY v.id, f.destaque DESC) AS subquery";
 
         if (isset($filtros['ordem'])) {
             if ($filtros['ordem'] == 'menor_preco') {

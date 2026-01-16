@@ -3,26 +3,26 @@ require_once __DIR__ . '/../Models/Veiculo.php';
 
 class VeiculoController {
     
-    // Lista todos os veículos (Página Inicial/Vitrine)
+    // Lista todos os veículos (Com Filtros)
     public function index() {
-    // Captura os dados enviados pelo formulário de filtro
-    $filtros = [
-        'busca'     => $_GET['busca'] ?? '',
-        'preco_min' => $_GET['preco_min'] ?? '',
-        'preco_max' => $_GET['preco_max'] ?? '',
-        'ano_min'   => $_GET['ano_min'] ?? '',
-        'ano_max'   => $_GET['ano_max'] ?? '',
-        'km_min'    => $_GET['km_min'] ?? '',
-        'km_max'    => $_GET['km_max'] ?? '',
-        'ordem'     => $_GET['ordem'] ?? 'recente'
-    ];
+        // Captura os dados enviados pelo formulário de filtro
+        $filtros = [
+            'busca'     => $_GET['busca'] ?? '',
+            'preco_min' => $_GET['preco_min'] ?? '',
+            'preco_max' => $_GET['preco_max'] ?? '',
+            'ano_min'   => $_GET['ano_min'] ?? '',
+            'ano_max'   => $_GET['ano_max'] ?? '',
+            'km_min'    => $_GET['km_min'] ?? '',
+            'km_max'    => $_GET['km_max'] ?? '',
+            'ordem'     => $_GET['ordem'] ?? 'recente'
+        ];
 
-    $veiculoModel = new Veiculo();
-    // Chamamos a nova função de listar com filtros
-    $veiculos = $veiculoModel->listarComFiltros($filtros);
-    
-    require_once __DIR__ . '/../Views/veiculos/index.php';
-}
+        $veiculoModel = new Veiculo();
+        // Chamamos a função de listar com filtros
+        $veiculos = $veiculoModel->listarComFiltros($filtros);
+        
+        require_once __DIR__ . '/../Views/veiculos/index.php';
+    }
 
     // Exibe o formulário de cadastro (Apenas Admin)
     public function create() {
@@ -30,7 +30,7 @@ class VeiculoController {
         require_once __DIR__ . '/../Views/veiculos/create.php';
     }
 
-    // Recebe os dados do formulário e salva no banco (CRIAR)
+    // --- ATUALIZADO: Recebe múltiplas fotos e salva no banco ---
     public function store() {
         $this->verificarAdmin();
 
@@ -40,38 +40,50 @@ class VeiculoController {
             $ano_fabricacao = $_POST['ano_fabricacao'];
             $ano_modelo = $_POST['ano_modelo'];
             $valor = $_POST['valor'];
-            $km = $_POST['km']; // Quilometragem
+            $km = $_POST['km'];
             $descricao = $_POST['descricao'];
             
-            // Lógica de Upload de Foto
-            $caminhoFoto = null;
-            if (isset($_FILES['foto']) && $_FILES['foto']['error'] === 0) {
-                $extensao = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
-                $novoNome = uniqid() . "." . $extensao;
-                $destino = __DIR__ . '/../../public/uploads/' . $novoNome;
+            // Array para guardar os caminhos das várias fotos
+            $caminhosFotos = [];
+
+            // Verifica se o campo 'fotos' (do input multiple) foi enviado
+            if (isset($_FILES['fotos']) && !empty($_FILES['fotos']['name'][0])) {
                 
-                if (move_uploaded_file($_FILES['foto']['tmp_name'], $destino)) {
-                    $caminhoFoto = 'uploads/' . $novoNome;
+                // Conta quantos arquivos vieram
+                $totalArquivos = count($_FILES['fotos']['name']);
+
+                for ($i = 0; $i < $totalArquivos; $i++) {
+                    // Verifica se não deu erro no upload deste arquivo específico
+                    if ($_FILES['fotos']['error'][$i] === 0) {
+                        
+                        $extensao = pathinfo($_FILES['fotos']['name'][$i], PATHINFO_EXTENSION);
+                        // Cria nome único: id_unico-indice.extensao
+                        $novoNome = uniqid() . "-" . $i . "." . $extensao;
+                        $destino = __DIR__ . '/../../public/uploads/' . $novoNome;
+                        
+                        // Move o arquivo para a pasta uploads
+                        if (move_uploaded_file($_FILES['fotos']['tmp_name'][$i], $destino)) {
+                            $caminhosFotos[] = 'uploads/' . $novoNome;
+                        }
+                    }
                 }
             }
 
             $veiculoModel = new Veiculo();
             
-            // Cadastra no banco
-            $veiculoModel->cadastrar($marca, $modelo, $ano_fabricacao, $ano_modelo, $valor, $km, $descricao, $caminhoFoto);
+            // Agora passamos o ARRAY $caminhosFotos em vez de uma string única
+            // Certifique-se que seu Model Veiculo -> cadastrar() já está atualizado para receber array
+            $veiculoModel->cadastrar($marca, $modelo, $ano_fabricacao, $ano_modelo, $valor, $km, $descricao, $caminhosFotos);
 
             header('Location: /veiculos'); 
             exit;
         }
     }
 
-    // --- MÉTODOS NOVOS PARA EDIÇÃO ---
-
-    // 1. Carrega o formulário de edição com os dados preenchidos
+    // Carrega o formulário de edição
     public function edit() {
         $this->verificarAdmin();
 
-        // Verifica se passou o ID na URL (ex: /veiculos/edit?id=5)
         if (!isset($_GET['id'])) {
             header('Location: /veiculos');
             exit;
@@ -80,22 +92,20 @@ class VeiculoController {
         $veiculoModel = new Veiculo();
         $veiculo = $veiculoModel->buscarPorId($_GET['id']);
 
-        // Se o carro não existir, volta pra lista
         if (!$veiculo) {
             header('Location: /veiculos');
             exit;
         }
 
-        // Carrega a view de edição
         require_once __DIR__ . '/../Views/veiculos/edit.php';
     }
 
-    // 2. Recebe os dados editados e atualiza no banco
+    // Atualiza os dados (Edição)
     public function update() {
         $this->verificarAdmin();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id = $_POST['id']; // ID é fundamental para saber quem atualizar
+            $id = $_POST['id'];
             $marca = $_POST['marca'];
             $modelo = $_POST['modelo'];
             $ano_fabricacao = $_POST['ano_fabricacao'];
@@ -104,7 +114,8 @@ class VeiculoController {
             $km = $_POST['km'];
             $descricao = $_POST['descricao'];
             
-            // Lógica de Upload (Só troca a foto se o usuário enviou uma nova)
+            // Lógica de Upload para Edição (Por enquanto, substitui a foto principal)
+            // Se quiser adicionar mais fotos na edição, precisaremos de uma lógica mais complexa depois
             $caminhoFoto = null;
             if (isset($_FILES['foto']) && $_FILES['foto']['error'] === 0) {
                 $extensao = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
@@ -117,8 +128,6 @@ class VeiculoController {
             }
 
             $veiculoModel = new Veiculo();
-            
-            // Chama a função atualizar do Model
             $veiculoModel->atualizar($id, $marca, $modelo, $ano_fabricacao, $ano_modelo, $valor, $km, $descricao, $caminhoFoto);
 
             header('Location: /veiculos');
@@ -145,7 +154,8 @@ class VeiculoController {
             exit;
         }
     }
-    // Exibe os detalhes de UM veículo específico
+
+    // Exibe os detalhes de UM veículo específico (Carrossel)
     public function show() {
         if (!isset($_GET['id'])) {
             header('Location: /veiculos');
@@ -154,7 +164,7 @@ class VeiculoController {
 
         $veiculoModel = new Veiculo();
         
-        // 1. Busca os dados do carro (Texto, Preço, etc)
+        // 1. Busca os dados do carro
         $veiculo = $veiculoModel->buscarPorId($_GET['id']);
 
         if (!$veiculo) {
@@ -165,7 +175,7 @@ class VeiculoController {
         // 2. Busca TODAS as fotos desse carro para o carrossel
         $fotos = $veiculoModel->buscarFotos($_GET['id']);
         
-        // Se não tiver fotos extras, cria um array com a foto principal para não quebrar o carrossel
+        // Fallback: Se não tiver fotos na tabela nova, usa a antiga
         if (empty($fotos) && !empty($veiculo['url_foto'])) {
             $fotos = [['url_foto' => $veiculo['url_foto']]];
         }
