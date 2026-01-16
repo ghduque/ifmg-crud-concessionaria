@@ -54,11 +54,45 @@
                     </div>
                 </form>
             </div>
-                </form>
-            </div>
 
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var emailInput = document.querySelector('input[name="email"]');
+            var senhaInput = document.querySelector('input[name="senha"]');
+            var form = document.querySelector('form');
+
+            // Função que limpa o campo
+            function limparCampo(input) {
+                if (input && input.value) {
+                    input.value = input.value.trim();
+                }
+            }
+
+            // 1. Limpa assim que o usuário clica fora do campo (BLUR)
+            if (emailInput) {
+                emailInput.addEventListener('blur', function() { limparCampo(this); });
+                // Limpa também se o usuário colar algo (PASTE)
+                emailInput.addEventListener('paste', function() { 
+                    setTimeout(() => limparCampo(this), 10); // Pequeno delay para processar o colar
+                });
+            }
+
+            if (senhaInput) {
+                senhaInput.addEventListener('blur', function() { limparCampo(this); });
+            }
+
+            // 2. Limpa na hora de ENVIAR (Garante 100%)
+            if (form) {
+                form.addEventListener('submit', function(event) {
+                    limparCampo(emailInput);
+                    limparCampo(senhaInput);
+                });
+            }
+        });
+    </script>
 
 </body>
 </html>
