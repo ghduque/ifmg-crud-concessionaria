@@ -35,6 +35,26 @@
 </style>
 
 <div class="container py-4">
+
+    <?php if (isset($_GET['msg']) && $_GET['msg'] === 'perfil_atualizado'): ?>
+        <div class="alert alert-success alert-dismissible fade show shadow-sm border-start border-success border-5 mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-check-circle fs-4 me-3 text-success"></i>
+                <div>
+                    <strong class="d-block">Tudo certo!</strong>
+                    Suas informações de perfil foram atualizadas com sucesso.
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['msg']) && $_GET['msg'] === 'criado'): ?>
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            <i class="fas fa-user-check me-2"></i> Usuário criado com sucesso!
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
     <div class="row mb-4">
         <div class="col-12 text-center text-md-start">
             <h2 class="fw-bold text-uppercase text-dark">Nossos <span class="text-primary">Veículos</span></h2>

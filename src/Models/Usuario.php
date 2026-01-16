@@ -19,11 +19,24 @@ class Usuario {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Método extra: Criar usuário (útil para criar o primeiro admin via código)
-    public function criar($nome, $email,$cpf, $telefone, $senha, $papel = 'comum') {
+    // --- NOVO: Busca pelo ID (Necessário para a edição de perfil) ---
+    public function buscarPorId($id) {
+        $query = "SELECT * FROM usuarios WHERE id = :id LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // Cria usuário (Cadastro)
+    public function criar($nome, $email, $cpf, $telefone, $senha, $papel = 'usuario') {
+        // Gera o hash da senha
         $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
         
-        $query = "INSERT INTO usuarios (nome, email, cpf, telefone, senha_hash, papel) VALUES (:nome, :email, :cpf, :telefone, :senha, :papel)";
+        $query = "INSERT INTO usuarios (nome, email, cpf, telefone, senha_hash, papel) 
+                  VALUES (:nome, :email, :cpf, :telefone, :senha, :papel)";
+        
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':nome', $nome);
         $stmt->bindParam(':email', $email);
@@ -33,6 +46,30 @@ class Usuario {
         $stmt->bindParam(':papel', $papel);
         
         return $stmt->execute();
+    }
+
+    // --- NOVO: Atualiza os dados do perfil (Resolve o Erro 500) ---
+    public function atualizarPerfil($id, $nome, $email, $telefone, $senhaHash) {
+        try {
+            $query = "UPDATE usuarios 
+                      SET nome = :nome, 
+                          email = :email, 
+                          telefone = :telefone, 
+                          senha_hash = :senha 
+                      WHERE id = :id";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':nome', $nome);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':telefone', $telefone);
+            $stmt->bindParam(':senha', $senhaHash);
+            $stmt->bindParam(':id', $id);
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            // Retorna falso se der erro (ex: e-mail duplicado)
+            return false;
+        }
     }
 }
 ?>

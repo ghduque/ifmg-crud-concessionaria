@@ -69,6 +69,11 @@ switch ($url) {
         $controller->perfil();
         break;
 
+    case '/perfil/atualizar':
+        $controller = new UsuarioController();
+        $controller->atualizar();
+        break;
+
     case '/veiculos/edit':
         $controller = new VeiculoController();
         $controller->edit();

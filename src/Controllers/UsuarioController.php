@@ -9,28 +9,29 @@ class UsuarioController {
     }
 
     // Processa o login
-   // Processa o login
     public function autenticar() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = $_POST['email'];
-            $senha = $_POST['senha'];
+            
+            // --- CORREÇÃO DEFINITIVA: Limpa espaços do e-mail E da senha ---
+            $email = trim($_POST['email']); 
+            $senha = trim($_POST['senha']); // Agora "123 " vira "123"
 
             $usuarioModel = new Usuario();
+            // Usa a variável $email limpa, e não o $_POST direto
             $usuario = $usuarioModel->buscarPorEmail($email);
 
             // Verifica se usuário existe e se a senha bate com o hash
             if ($usuario && password_verify($senha, $usuario['senha_hash'])) {
                 if (session_status() === PHP_SESSION_NONE) session_start();
                 
-                // --- AQUI ESTÁ A CHAVE: SALVAR TODOS OS DADOS NA SESSÃO ---
+                // Salva dados na sessão
                 $_SESSION['usuario_id'] = $usuario['id'];
                 $_SESSION['nome']       = $usuario['nome'];
-                $_SESSION['email']      = $usuario['email']; // Essencial para o perfil
+                $_SESSION['email']      = $usuario['email'];
                 $_SESSION['papel']      = $usuario['papel']; 
-                $_SESSION['cpf']        = $usuario['cpf'] ?? ''; // Salva se existir no banco
-                $_SESSION['telefone']   = $usuario['telefone'] ?? ''; // Salva se existir no banco
+                $_SESSION['cpf']        = $usuario['cpf'] ?? ''; 
+                $_SESSION['telefone']   = $usuario['telefone'] ?? '';
 
-                // Redireciona para o estoque
                 header('Location: /veiculos');
                 exit;
             } else {
@@ -41,41 +42,52 @@ class UsuarioController {
     }
 
     public function atualizar() {
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if (session_status() === PHP_SESSION_NONE) session_start();
-        
-        $usuario_id = $_SESSION['usuario_id'];
-        $nome = $_POST['nome'];
-        $email = $_POST['email'];
-        $telefone = $_POST['telefone'];
-        $senha_atual = $_POST['senha_atual'];
-        $nova_senha = $_POST['nova_senha'];
+        // Verifica se é POST
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (session_status() === PHP_SESSION_NONE) session_start();
+            
+            // Verifica login
+            if (!isset($_SESSION['usuario_id'])) {
+                header('Location: /login'); exit;
+            }
+            
+            $usuario_id = $_SESSION['usuario_id'];
+            
+            // 1. Limpeza dos dados
+            $nome = trim($_POST['nome']);
+            $email = trim($_POST['email']);
+            $telefone = $_POST['telefone']; 
+            
+            $senha_atual = trim($_POST['senha_atual']);
+            $nova_senha = trim($_POST['nova_senha']);
 
-        $usuarioModel = new Usuario();
-        $usuario = $usuarioModel->buscarPorId($usuario_id);
+            $usuarioModel = new Usuario();
+            $usuario = $usuarioModel->buscarPorId($usuario_id);
 
-        // 1. Verificar se a senha atual está correta
-        if (!password_verify($senha_atual, $usuario['senha_hash'])) {
-            $erro = "Senha atual incorreta!";
-            require_once __DIR__ . '/../Views/auth/perfil.php';
-            return;
-        }
+            // 2. Verificar senha atual
+            if (!password_verify($senha_atual, $usuario['senha_hash'])) {
+                // Se errar a senha, volta para o perfil com erro
+                $erro = "Senha atual incorreta!";
+                require_once __DIR__ . '/../Views/auth/perfil.php';
+                return;
+            }
 
-        // 2. Se houver nova senha, gerar o hash. Se não, manter a atual.
-        $senha_final = !empty($nova_senha) ? password_hash($nova_senha, PASSWORD_DEFAULT) : $usuario['senha_hash'];
+            // 3. Define qual senha salvar
+            $senha_final = !empty($nova_senha) ? password_hash($nova_senha, PASSWORD_DEFAULT) : $usuario['senha_hash'];
 
-        // 3. Salvar no banco
-        if ($usuarioModel->atualizarPerfil($usuario_id, $nome, $email, $telefone, $senha_final)) {
-            // Atualizar os dados da sessão para refletir no header imediatamente
-            $_SESSION['nome'] = $nome;
-            $_SESSION['email'] = $email;
-            $_SESSION['telefone'] = $telefone;
+            // 4. Salva no banco
+            if ($usuarioModel->atualizarPerfil($usuario_id, $nome, $email, $telefone, $senha_final)) {
+                // Atualiza a sessão para o nome mudar no topo da página imediatamente
+                $_SESSION['nome'] = $nome;
+                $_SESSION['email'] = $email;
+                $_SESSION['telefone'] = $telefone;
 
-            header('Location: /perfil?sucesso=1');
-            exit;
+                // --- MUDANÇA AQUI: Redireciona para o ESTOQUE com mensagem de sucesso ---
+                header('Location: /veiculos?msg=perfil_atualizado');
+                exit;
+            }
         }
     }
-}
 
     // Faz logout
     public function logout() {
@@ -86,30 +98,31 @@ class UsuarioController {
     }
 
     public function perfil() {
-    // Verifica se está logado antes de mostrar a página
-    if (!isset($_SESSION['usuario_id'])) {
-        header('Location: /login');
-        exit;
-    }
-    
-    // Aqui você pode buscar dados extras no banco se necessário
-    include __DIR__ . '/../Views/auth/perfil.php';
-}
+        if (session_status() === PHP_SESSION_NONE) session_start();
 
-    // Exibe o formulário de cadastro
+        if (!isset($_SESSION['usuario_id'])) {
+            header('Location: /login');
+            exit;
+        }
+        
+        include __DIR__ . '/../Views/auth/perfil.php';
+    }
+
     public function cadastro() {
         require_once __DIR__ . '/../Views/auth/register.php';
     }
 
-    // --- AQUI ESTÁ A MUDANÇA PRINCIPAL ---
+    // --- CADASTRO NOVO ---
     public function salvar() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $nome = $_POST['nome'];
-            $email = $_POST['email'];
-            $senha = $_POST['senha'];
-            $confirmar = $_POST['confirmar_senha'];
             
-            // 1. Captura e LIMPA a formatação (tira pontos e traços)
+            // --- LIMPEZA TOTAL NOS DADOS DE ENTRADA ---
+            $nome = trim($_POST['nome']);
+            $email = trim($_POST['email']);
+            $senha = trim($_POST['senha']);
+            $confirmar = trim($_POST['confirmar_senha']);
+            
+            // Limpa CPF e Telefone (apenas números)
             $cpf = preg_replace('/[^0-9]/', '', $_POST['cpf']);
             $telefone = preg_replace('/[^0-9]/', '', $_POST['telefone']);
 
@@ -120,14 +133,14 @@ class UsuarioController {
                 return;
             }
 
-            // 3. Validação de CPF (Matemática)
+            // 3. Validação de CPF
             if (!$this->validarCPF($cpf)) {
                 $erro = "CPF inválido! Verifique os números digitados.";
                 require_once __DIR__ . '/../Views/auth/register.php';
                 return;
             }
 
-            // 4. Validação de Telefone (10 ou 11 dígitos)
+            // 4. Validação de Telefone
             if (strlen($telefone) < 10 || strlen($telefone) > 11) {
                 $erro = "Telefone inválido! Digite DDD + Número.";
                 require_once __DIR__ . '/../Views/auth/register.php';
@@ -136,17 +149,14 @@ class UsuarioController {
 
             $usuarioModel = new Usuario();
             
-            // Verifica se email já existe
             if ($usuarioModel->buscarPorEmail($email)) {
                 $erro = "Este e-mail já está cadastrado!";
                 require_once __DIR__ . '/../Views/auth/register.php';
                 return;
             }
 
-            // 5. Salva no banco passando os NOVOS campos ($cpf, $telefone)
-            // Certifique-se que seu Usuario.php (Model) também foi atualizado!
+            // 5. Salva no banco (Agora a senha salva já está sem espaços extras)
             if ($usuarioModel->criar($nome, $email, $cpf, $telefone, $senha)) {
-                // Sucesso: Redireciona para login
                 header('Location: /login?msg=criado'); 
                 exit;
             } else {
@@ -156,29 +166,17 @@ class UsuarioController {
         }
     }
 
-    // --- FUNÇÃO PRIVADA PARA VALIDAR MATEMATICAMENTE O CPF ---
     private function validarCPF($cpf) {
-        // Extrai somente os números
         $cpf = preg_replace( '/[^0-9]/is', '', $cpf );
-         
-        if (strlen($cpf) != 11) {
-            return false;
-        }
+        if (strlen($cpf) != 11) return false;
+        if (preg_match('/(\d)\1{10}/', $cpf)) return false;
 
-        // Verifica sequências repetidas (ex: 111.111.111-11)
-        if (preg_match('/(\d)\1{10}/', $cpf)) {
-            return false;
-        }
-
-        // Cálculo dos dígitos verificadores
         for ($t = 9; $t < 11; $t++) {
             for ($d = 0, $c = 0; $c < $t; $c++) {
                 $d += $cpf[$c] * (($t + 1) - $c);
             }
             $d = ((10 * $d) % 11) % 10;
-            if ($cpf[$c] != $d) {
-                return false;
-            }
+            if ($cpf[$c] != $d) return false;
         }
         return true;
     }
