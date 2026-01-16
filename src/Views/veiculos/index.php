@@ -36,17 +36,19 @@
 
 <div class="container py-4">
 
-    <?php if (isset($_GET['msg']) && $_GET['msg'] === 'perfil_atualizado'): ?>
+    <?php if (isset($_SESSION['flash_sucesso'])): ?>
         <div class="alert alert-success alert-dismissible fade show shadow-sm border-start border-success border-5 mb-4" role="alert">
             <div class="d-flex align-items-center">
                 <i class="fas fa-check-circle fs-4 me-3 text-success"></i>
                 <div>
                     <strong class="d-block">Tudo certo!</strong>
-                    Suas informações de perfil foram atualizadas com sucesso.
+                    <?= $_SESSION['flash_sucesso'] ?>
                 </div>
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+        
+        <?php unset($_SESSION['flash_sucesso']); ?>
     <?php endif; ?>
 
     <?php if (isset($_GET['msg']) && $_GET['msg'] === 'criado'): ?>

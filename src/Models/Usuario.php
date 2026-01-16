@@ -19,7 +19,7 @@ class Usuario {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // --- NOVO: Busca pelo ID (Necessário para a edição de perfil) ---
+    // Busca pelo ID (Necessário para a edição de perfil)
     public function buscarPorId($id) {
         $query = "SELECT * FROM usuarios WHERE id = :id LIMIT 1";
         $stmt = $this->conn->prepare($query);
@@ -29,8 +29,8 @@ class Usuario {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Cria usuário (Cadastro)
-    public function criar($nome, $email, $cpf, $telefone, $senha, $papel = 'usuario') {
+    // --- CORREÇÃO AQUI: Mudei de 'usuario' para 'comum' ---
+    public function criar($nome, $email, $cpf, $telefone, $senha, $papel = 'comum') {
         // Gera o hash da senha
         $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
         
@@ -48,7 +48,7 @@ class Usuario {
         return $stmt->execute();
     }
 
-    // --- NOVO: Atualiza os dados do perfil (Resolve o Erro 500) ---
+    // Atualiza os dados do perfil
     public function atualizarPerfil($id, $nome, $email, $telefone, $senhaHash) {
         try {
             $query = "UPDATE usuarios 
