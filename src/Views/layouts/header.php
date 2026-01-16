@@ -38,7 +38,7 @@
                         <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow-lg">
                             <li><a class="dropdown-item py-2" href="/perfil"><i class="fas fa-id-card-alt me-2 text-warning"></i> Meu Perfil</a></li>
                             <?php if ($_SESSION['papel'] === 'admin'): ?>
-                                <li><a class="dropdown-item py-2" href="/admin/dashboard"><i class="fas fa-chart-line me-2 text-warning"></i> Painel Admin</a></li>
+                                <li><a class="dropdown-item py-2" href="/veiculos/criar"><i class="fas fa-plus-circle me-2 text-warning"></i> Anunciar Veículo</a></li>
                             <?php endif; ?>
                             <li><hr class="dropdown-divider border-secondary"></li>
                             <li><a class="dropdown-item py-2 text-danger fw-bold" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Sair</a></li>
