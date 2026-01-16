@@ -62,20 +62,24 @@ switch ($url) {
         $controller = new UsuarioController();
         $controller->salvar();
         break;
+
+    // --- NOVA ROTA PARA O PERFIL ---
+    case '/perfil':
+        $controller = new UsuarioController();
+        $controller->perfil();
+        break;
+
     case '/veiculos/edit':
-        require_once __DIR__ . '/../src/Controllers/VeiculoController.php';
         $controller = new VeiculoController();
         $controller->edit();
         break;
 
     case '/veiculos/update':
-        require_once __DIR__ . '/../src/Controllers/VeiculoController.php';
         $controller = new VeiculoController();
         $controller->update();
         break;
-        // 7. Página de Detalhes (Ver Oferta)
+
     case '/veiculos/detalhes':
-        require_once __DIR__ . '/../src/Controllers/VeiculoController.php';
         $controller = new VeiculoController();
         $controller->show();
         break;

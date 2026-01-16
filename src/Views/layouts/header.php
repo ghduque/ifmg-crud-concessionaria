@@ -10,9 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
 </head>
-<body style="background-color: #121212; color: #fff;">
-
-<header class="container-fluid p-0 m-0 bg-black border-bottom border-dark position-relative d-flex justify-content-center align-items-center" style="min-height: 120px;">
+<body style="background-color: #ffffff; color: #212529;"> <header class="container-fluid p-0 m-0 bg-black border-bottom border-secondary position-relative d-flex justify-content-center align-items-center" style="min-height: 150px;">
     
     <a href="/veiculos" style="text-decoration: none; width: 100%; display: flex; justify-content: center;">
         <img src="/img/logo-autonivel.png" 
@@ -21,67 +19,85 @@
     </a>
 
     <div class="position-absolute top-0 end-0 h-100 d-none d-lg-flex align-items-center pe-5" style="z-index: 10;">
-        <ul class="nav gap-4">
-            
-            <li class="nav-item">
-                <a class="nav-link text-uppercase fw-bold text-white small" href="/veiculos">
-                    <i class="fas fa-car me-2 text-warning"></i>Estoque
+        <div class="d-flex flex-column align-items-end gap-2"> <div class="d-flex align-items-center gap-3 mb-1">
+                <a class="nav-link text-uppercase fw-bold text-white small hover-warning" href="/veiculos">
+                    <i class="fas fa-car me-1 text-warning"></i> Estoque
                 </a>
-            </li>
 
-            <?php 
-            if (session_status() === PHP_SESSION_NONE) session_start();
-            
-            if (isset($_SESSION['usuario_id'])): ?>
-                
-                <?php if ($_SESSION['papel'] === 'admin'): ?>
-                    <li class="nav-item">
-                        <a class="btn btn-sm btn-outline-warning fw-bold rounded-0" href="/veiculos/criar">
-                            ANUNCIAR
+                <?php 
+                if (session_status() === PHP_SESSION_NONE) session_start();
+                if (isset($_SESSION['usuario_id'])): ?>
+                    <div class="dropdown">
+                        <a class="nav-link dropdown-toggle text-white fw-bold small text-uppercase d-flex align-items-center" 
+                           href="#" role="button" data-bs-toggle="dropdown">
+                           <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 28px; height: 28px;">
+                               <i class="fas fa-user" style="font-size: 0.8rem;"></i>
+                           </div>
+                           <?= explode(' ', $_SESSION['nome'])[0] ?>
                         </a>
-                    </li>
+                        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow-lg">
+                            <li><a class="dropdown-item py-2" href="/perfil"><i class="fas fa-id-card-alt me-2 text-warning"></i> Meu Perfil</a></li>
+                            <?php if ($_SESSION['papel'] === 'admin'): ?>
+                                <li><a class="dropdown-item py-2" href="/admin/dashboard"><i class="fas fa-chart-line me-2 text-warning"></i> Painel Admin</a></li>
+                            <?php endif; ?>
+                            <li><hr class="dropdown-divider border-secondary"></li>
+                            <li><a class="dropdown-item py-2 text-danger fw-bold" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Sair</a></li>
+                        </ul>
+                    </div>
+                <?php else: ?>
+                    <a class="btn btn-outline-light btn-sm px-3 rounded-pill fw-bold" href="/login">LOGIN</a>
                 <?php endif; ?>
+            </div>
 
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-white-50 small text-uppercase fw-bold" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle me-1"></i> 
-                        <?= explode(' ', $_SESSION['nome'])[0] ?> 
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-dark shadow rounded-0 dropdown-menu-end">
-                        <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Sair</a></li>
-                    </ul>
-                </li>
-
-            <?php else: ?>
-                <li class="nav-item">
-                    <a class="nav-link btn btn-outline-light btn-sm px-3 border-0 small text-uppercase fw-bold" href="/login">
-                        <i class="fas fa-user me-2"></i> Login
-                    </a>
-                </li>
+            <?php if (isset($_SESSION['usuario_id']) && $_SESSION['papel'] === 'admin'): ?>
+                <a class="btn btn-warning fw-bold rounded-pill px-4 shadow-sm" href="/veiculos/criar" style="font-size: 0.75rem; letter-spacing: 1px;">
+                    <i class="fas fa-plus-circle me-1"></i> ANUNCIAR VEÍCULO
+                </a>
             <?php endif; ?>
 
-        </ul>
+        </div>
     </div>
 
     <nav class="navbar navbar-dark d-lg-none position-absolute top-0 end-0 h-100 pe-3">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu">
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
     </nav>
-
 </header>
 
-<div class="collapse navbar-collapse bg-dark border-bottom border-secondary d-lg-none" id="mobileMenu">
-    <div class="container py-3">
-        <ul class="navbar-nav text-center gap-3">
-            <li class="nav-item"><a class="nav-link text-white" href="/veiculos">ESTOQUE</a></li>
+<div class="collapse navbar-collapse bg-black border-bottom border-secondary d-lg-none" id="mobileMenu">
+    <div class="container py-3 text-center">
+        <ul class="navbar-nav gap-2">
+            <li class="nav-item"><a class="nav-link text-white fw-bold" href="/veiculos">ESTOQUE</a></li>
             <?php if (isset($_SESSION['usuario_id'])): ?>
-                <li class="nav-item"><a class="nav-link text-warning" href="/logout">SAIR (<?= $_SESSION['nome'] ?>)</a></li>
+                <?php if ($_SESSION['papel'] === 'admin'): ?>
+                    <li class="nav-item"><a class="nav-link text-warning fw-bold" href="/veiculos/criar">ANUNCIAR</a></li>
+                <?php endif; ?>
+                <li class="nav-item"><a class="nav-link text-white fw-bold" href="/perfil">MEU PERFIL</a></li>
+                <li class="nav-item"><a class="nav-link text-danger fw-bold" href="/logout">SAIR</a></li>
             <?php else: ?>
-                <li class="nav-item"><a class="nav-link text-white" href="/login">Login</a></li>
+                <li class="nav-item"><a class="nav-link text-white fw-bold" href="/login">LOGIN</a></li>
             <?php endif; ?>
         </ul>
     </div>
 </div>
 
-<div class="container py-5"></div>
+<style>
+    /* Correção para o conteúdo não subir */
+    header {
+        position: relative !important;
+        z-index: 1000;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .dropdown-item:hover {
+        background-color: #212529;
+        color: #ffc107 !important;
+        padding-left: 20px;
+    }
+    
+    .hover-warning:hover {
+        color: #ffc107 !important;
+        transition: 0.3s;
+    }
+</style>

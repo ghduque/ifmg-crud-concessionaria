@@ -9,6 +9,7 @@ class UsuarioController {
     }
 
     // Processa o login
+   // Processa o login
     public function autenticar() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = $_POST['email'];
@@ -20,19 +21,61 @@ class UsuarioController {
             // Verifica se usuário existe e se a senha bate com o hash
             if ($usuario && password_verify($senha, $usuario['senha_hash'])) {
                 if (session_status() === PHP_SESSION_NONE) session_start();
+                
+                // --- AQUI ESTÁ A CHAVE: SALVAR TODOS OS DADOS NA SESSÃO ---
                 $_SESSION['usuario_id'] = $usuario['id'];
-                $_SESSION['nome'] = $usuario['nome'];
-                $_SESSION['papel'] = $usuario['papel'];
+                $_SESSION['nome']       = $usuario['nome'];
+                $_SESSION['email']      = $usuario['email']; // Essencial para o perfil
+                $_SESSION['papel']      = $usuario['papel']; 
+                $_SESSION['cpf']        = $usuario['cpf'] ?? ''; // Salva se existir no banco
+                $_SESSION['telefone']   = $usuario['telefone'] ?? ''; // Salva se existir no banco
 
-               // Redireciona para o estoque
-               header('Location: /veiculos');
-               exit;
+                // Redireciona para o estoque
+                header('Location: /veiculos');
+                exit;
             } else {
                 $erro = "E-mail ou senha inválidos!";
                 require_once __DIR__ . '/../Views/auth/login.php';
             }
         }
     }
+
+    public function atualizar() {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        
+        $usuario_id = $_SESSION['usuario_id'];
+        $nome = $_POST['nome'];
+        $email = $_POST['email'];
+        $telefone = $_POST['telefone'];
+        $senha_atual = $_POST['senha_atual'];
+        $nova_senha = $_POST['nova_senha'];
+
+        $usuarioModel = new Usuario();
+        $usuario = $usuarioModel->buscarPorId($usuario_id);
+
+        // 1. Verificar se a senha atual está correta
+        if (!password_verify($senha_atual, $usuario['senha_hash'])) {
+            $erro = "Senha atual incorreta!";
+            require_once __DIR__ . '/../Views/auth/perfil.php';
+            return;
+        }
+
+        // 2. Se houver nova senha, gerar o hash. Se não, manter a atual.
+        $senha_final = !empty($nova_senha) ? password_hash($nova_senha, PASSWORD_DEFAULT) : $usuario['senha_hash'];
+
+        // 3. Salvar no banco
+        if ($usuarioModel->atualizarPerfil($usuario_id, $nome, $email, $telefone, $senha_final)) {
+            // Atualizar os dados da sessão para refletir no header imediatamente
+            $_SESSION['nome'] = $nome;
+            $_SESSION['email'] = $email;
+            $_SESSION['telefone'] = $telefone;
+
+            header('Location: /perfil?sucesso=1');
+            exit;
+        }
+    }
+}
 
     // Faz logout
     public function logout() {
@@ -41,6 +84,17 @@ class UsuarioController {
         header('Location: /login');
         exit;
     }
+
+    public function perfil() {
+    // Verifica se está logado antes de mostrar a página
+    if (!isset($_SESSION['usuario_id'])) {
+        header('Location: /login');
+        exit;
+    }
+    
+    // Aqui você pode buscar dados extras no banco se necessário
+    include __DIR__ . '/../Views/auth/perfil.php';
+}
 
     // Exibe o formulário de cadastro
     public function cadastro() {

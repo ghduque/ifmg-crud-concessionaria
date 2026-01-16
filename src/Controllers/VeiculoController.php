@@ -5,11 +5,24 @@ class VeiculoController {
     
     // Lista todos os veículos (Página Inicial/Vitrine)
     public function index() {
-        $veiculoModel = new Veiculo();
-        $veiculos = $veiculoModel->listarTodos();
-        
-        require_once __DIR__ . '/../Views/veiculos/index.php';
-    }
+    // Captura os dados enviados pelo formulário de filtro
+    $filtros = [
+        'busca'     => $_GET['busca'] ?? '',
+        'preco_min' => $_GET['preco_min'] ?? '',
+        'preco_max' => $_GET['preco_max'] ?? '',
+        'ano_min'   => $_GET['ano_min'] ?? '',
+        'ano_max'   => $_GET['ano_max'] ?? '',
+        'km_min'    => $_GET['km_min'] ?? '',
+        'km_max'    => $_GET['km_max'] ?? '',
+        'ordem'     => $_GET['ordem'] ?? 'recente'
+    ];
+
+    $veiculoModel = new Veiculo();
+    // Chamamos a nova função de listar com filtros
+    $veiculos = $veiculoModel->listarComFiltros($filtros);
+    
+    require_once __DIR__ . '/../Views/veiculos/index.php';
+}
 
     // Exibe o formulário de cadastro (Apenas Admin)
     public function create() {

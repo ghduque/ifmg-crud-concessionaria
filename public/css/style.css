@@ -183,3 +183,30 @@ body {
     padding-top: 10px;
     margin-top: 10px;
 }
+
+/* Garante que o header tenha uma altura fixa e não deixe o estoque subir */
+header {
+    min-height: 100px;
+    padding-bottom: 20px;
+    display: block;
+    clear: both; /* Limpa qualquer flutuação que o botão anunciar cause */
+}
+
+/* Espaçamento extra na página de estoque apenas quando for Admin */
+.admin-logado .estoque-container {
+    margin-top: 40px; 
+}
+
+/* Reduz o espaço entre as linhas para ficar mais compacto */
+.dado-linha {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Espaço reduzido de 30px para 20px */
+}
+
+/* Remove qualquer margem extra que o HR possa estar criando */
+hr.divisor-compacto {
+    margin: 10px 0 25px 0;
+    border: 0;
+    border-top: 1px solid #eee;
+}

@@ -148,5 +148,75 @@ class Veiculo {
             return false;
         }
     }
+    public function listarComFiltros($filtros) {
+        // 1. Iniciamos a consulta base
+        // Nota: O DISTINCT ON (v.id) exige que o primeiro campo do ORDER BY seja v.id
+        $sql = "SELECT DISTINCT ON (v.id) v.*, f.url_foto 
+                FROM veiculos v 
+                LEFT JOIN veiculos_fotos f ON v.id = f.veiculo_id 
+                WHERE 1=1";
+        
+        $params = [];
+
+        // Filtro de Busca (Marca ou Modelo)
+        if (!empty($filtros['busca'])) {
+            $sql .= " AND (v.modelo ILIKE :busca OR v.marca ILIKE :busca)";
+            $params[':busca'] = '%' . $filtros['busca'] . '%';
+        }
+
+        // Filtro de Preço
+        if (!empty($filtros['preco_min'])) {
+            $sql .= " AND v.valor >= :pmin";
+            $params[':pmin'] = $filtros['preco_min'];
+        }
+        if (!empty($filtros['preco_max'])) {
+            $sql .= " AND v.valor <= :pmax";
+            $params[':pmax'] = $filtros['preco_max'];
+        }
+
+        // Filtro de Ano
+        if (!empty($filtros['ano_min'])) {
+            $sql .= " AND v.ano_modelo >= :amin";
+            $params[':amin'] = $filtros['ano_min'];
+        }
+        if (!empty($filtros['ano_max'])) {
+            $sql .= " AND v.ano_modelo <= :amax";
+            $params[':amax'] = $filtros['ano_max'];
+        }
+
+        // Filtro de KM
+        if (!empty($filtros['km_min'])) {
+            $sql .= " AND v.km >= :kmin";
+            $params[':kmin'] = $filtros['km_min'];
+        }
+        if (!empty($filtros['km_max'])) {
+            $sql .= " AND v.km <= :kmax";
+            $params[':kmax'] = $filtros['km_max'];
+        }
+
+        // --- CORREÇÃO DA ORDENAÇÃO ---
+        // Para o DISTINCT ON funcionar, o v.id deve vir primeiro no ORDER BY interno.
+        // Mas para o usuário ver a ordem certa, envolvemos tudo em uma subquery.
+        
+        $sqlCompleto = "SELECT * FROM ($sql ORDER BY v.id) AS subquery";
+
+        if (isset($filtros['ordem'])) {
+            if ($filtros['ordem'] == 'menor_preco') {
+                $sqlCompleto .= " ORDER BY valor ASC";
+            } elseif ($filtros['ordem'] == 'maior_preco') {
+                $sqlCompleto .= " ORDER BY valor DESC";
+            } elseif ($filtros['ordem'] == 'recente') {
+                $sqlCompleto .= " ORDER BY id DESC";
+            } else {
+                $sqlCompleto .= " ORDER BY id DESC";
+            }
+        } else {
+            $sqlCompleto .= " ORDER BY id DESC";
+        }
+
+        $stmt = $this->conn->prepare($sqlCompleto);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 ?>
