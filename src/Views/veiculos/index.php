@@ -1,10 +1,10 @@
-<?php include __DIR__ . '/../layouts/header.php'; ?>
+<?php include __DIR__ . '/../layouts/cabecalho.php'; ?>
 
 <style>
     /* Fundo geral da página */
     body { background-color: #f5f7fa !important; color: #333 !important; }
 
-    /* Estilo dos Inputs do Filtro (Fundo Escuro + Letra Branca) */
+    /* Estilo dos Inputs do Filtro */
     .input-filtro {
         background-color: #212529 !important;
         border: 1px solid #495057 !important;
@@ -15,7 +15,7 @@
     
     .input-filtro:focus {
         background-color: #000 !important;
-        border-color: #0d6efd !important; /* Azul conforme seu tema */
+        border-color: #0d6efd !important;
         color: #fff !important;
         box-shadow: none !important;
     }
@@ -47,7 +47,6 @@
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        
         <?php unset($_SESSION['flash_sucesso']); ?>
     <?php endif; ?>
 
@@ -57,6 +56,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
+
     <div class="row mb-4">
         <div class="col-12 text-center text-md-start">
             <h2 class="fw-bold text-uppercase text-dark">Nossos <span class="text-primary">Veículos</span></h2>
@@ -118,7 +118,8 @@
                 
                 <div class="d-flex align-items-center">
                     <label class="text-muted small me-2 d-none d-md-block">Ordenar por:</label>
-                    <select class="form-select form-select-sm border-secondary text-dark" style="width: auto;" onchange="alterarOrdem(this.value)">
+                    
+                    <select class="form-select form-select-sm border-secondary text-dark" style="width: auto;" id="ordenacaoVeiculos">
                         <option value="recente" <?= ($_GET['ordem'] ?? '') == 'recente' ? 'selected' : '' ?>>Mais Recentes</option>
                         <option value="menor_preco" <?= ($_GET['ordem'] ?? '') == 'menor_preco' ? 'selected' : '' ?>>Menor Preço</option>
                         <option value="maior_preco" <?= ($_GET['ordem'] ?? '') == 'maior_preco' ? 'selected' : '' ?>>Maior Preço</option>
@@ -178,14 +179,6 @@
         </main>
     </div>
 </div>
+<script src="/js/main.js"></script>
 
-<script>
-// Função para mudar a ordem mantendo os filtros atuais na URL
-function alterarOrdem(valor) {
-    const urlParams = new URLSearchParams(window.location.search);
-    urlParams.set('ordem', valor);
-    window.location.search = urlParams.toString();
-}
-</script>
-
-<?php include __DIR__ . '/../layouts/footer.php'; ?>
+<?php include __DIR__ . '/../layouts/rodape.php'; ?>

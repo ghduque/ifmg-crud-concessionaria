@@ -1,4 +1,4 @@
-<?php include __DIR__ . '/../layouts/header.php'; ?>
+<?php include __DIR__ . '/../layouts/cabecalho.php'; ?>
 
 <style>
     body { background-color: #ffffff !important; color: #212529 !important; }
@@ -117,4 +117,4 @@
     </div>
 </div>
 
-<?php include __DIR__ . '/../layouts/footer.php'; ?>
+<?php include __DIR__ . '/../layouts/rodape.php'; ?>

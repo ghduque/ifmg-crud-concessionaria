@@ -107,3 +107,56 @@ function mascaraTelefone(input) {
     }
     input.value = v;
 }
+
+/* Lógica da Página de Login */
+document.addEventListener("DOMContentLoaded", function() {
+    // Verifica se estamos na página de login procurando pelo formulário específico
+    // ou podemos verificar pela URL, mas verificar a existência dos campos é mais seguro
+    const loginForm = document.querySelector('form[action="/login/auth"]');
+    
+    if (loginForm) {
+        const emailInput = loginForm.querySelector('input[name="email"]');
+        const senhaInput = loginForm.querySelector('input[name="senha"]');
+
+        function limparCampo(input) {
+            if (input && input.value) {
+                input.value = input.value.trim();
+            }
+        }
+
+        // Eventos de Blur e Paste
+        if (emailInput) {
+            emailInput.addEventListener('blur', function() { limparCampo(this); });
+            emailInput.addEventListener('paste', function() { 
+                setTimeout(() => limparCampo(this), 10); 
+            });
+        }
+
+        if (senhaInput) {
+            senhaInput.addEventListener('blur', function() { limparCampo(this); });
+        }
+
+        // Evento de Submit
+        loginForm.addEventListener('submit', function(event) {
+            limparCampo(emailInput);
+            limparCampo(senhaInput);
+        });
+    }
+});
+
+/* Lógica de Ordenação de Veículos (index.php) */
+document.addEventListener("DOMContentLoaded", function() {
+    // Procura o select pelo ID que vamos adicionar no HTML
+    const selectOrdenacao = document.getElementById('ordenacaoVeiculos');
+
+    if (selectOrdenacao) {
+        selectOrdenacao.addEventListener('change', function() {
+            const valor = this.value;
+            
+            // Lógica para atualizar a URL mantendo os outros filtros
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('ordem', valor);
+            window.location.search = urlParams.toString();
+        });
+    }
+});

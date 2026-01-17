@@ -1,4 +1,4 @@
-<?php include __DIR__ . '/../layouts/header.php'; ?>
+<?php include __DIR__ . '/../layouts/cabecalho.php'; ?>
 
 <div class="row justify-content-center">
     <div class="col-md-8">
@@ -65,4 +65,4 @@
     </div>
 </div>
 
-<?php include __DIR__ . '/../layouts/footer.php'; ?>
+<?php include __DIR__ . '/../layouts/rodape.php'; ?>

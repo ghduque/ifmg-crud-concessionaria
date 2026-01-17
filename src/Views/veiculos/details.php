@@ -1,4 +1,4 @@
-<?php include __DIR__ . '/../layouts/header.php'; ?>
+<?php include __DIR__ . '/../layouts/cabecalho.php'; ?>
 
 <style>
     /* --- CONFIGURAÇÃO DE CORES E LAYOUT --- */
@@ -209,4 +209,4 @@
     </div>
 </div>
 
-<?php include __DIR__ . '/../layouts/footer.php'; ?>
+<?php include __DIR__ . '/../layouts/rodape.php'; ?>

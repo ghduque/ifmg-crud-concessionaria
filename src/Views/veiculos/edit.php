@@ -1,4 +1,4 @@
-<?php include __DIR__ . '/../layouts/header.php'; ?>
+<?php include __DIR__ . '/../layouts/cabecalho.php'; ?>
 
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -86,4 +86,4 @@
     </div>
 </div>
 
-<?php include __DIR__ . '/../layouts/footer.php'; ?>
+<?php include __DIR__ . '/../layouts/rodape.php'; ?>
