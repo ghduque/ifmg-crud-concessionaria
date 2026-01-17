@@ -12,7 +12,9 @@ Projeto final desenvolvido para a disciplina de **Programação Web** do Institu
 
 O **AutoNível** é um sistema web completo para gerenciamento de estoque de veículos (Concessionária), desenvolvido utilizando a arquitetura **MVC (Model-View-Controller)** sem o uso de frameworks pesados, focando no aprendizado da linguagem PHP nativa e boas práticas de desenvolvimento.
 
-## Funcionalidades do Projeto
+---
+
+##  Funcionalidades do Projeto
 
 ###  Autenticação e Usuários
 - **Login Seguro:** Sistema de login com hash de senhas (`password_hash`) e proteção contra SQL Injection.
@@ -36,7 +38,7 @@ O **AutoNível** é um sistema web completo para gerenciamento de estoque de ve�
 ##  Tecnologias Utilizadas
 
 * **[PHP 8+](https://www.php.net/)**: Backend robusto com PDO para conexão segura ao banco de dados.
-* **[MySQL](https://www.mysql.com/)**: Banco de dados relacional.
+* **[PostgreSQL](https://www.postgresql.org/)**: Banco de dados relacional robusto e escalável.
 * **[Bootstrap 5](https://getbootstrap.com/)**: Framework CSS para agilidade e responsividade.
 * **[JavaScript (Vanilla)](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript)**: Manipulação do DOM, máscaras de input e lógica frontend.
 * **[HTML5 & CSS3](https://developer.mozilla.org/pt-BR/docs/Web/CSS)**: Estrutura semântica e estilização personalizada (Tema Dark/Yellow).
@@ -46,19 +48,21 @@ O **AutoNível** é um sistema web completo para gerenciamento de estoque de ve�
 ## 📂 Estrutura do Projeto (MVC)
 
 O projeto foi organizado para facilitar a manutenção e escalabilidade:
-```
+
+```text
 /src
-├── Controllers/ # Lógica de negócio (Usuario, Veiculo, Auth)
-├── Models/ # Acesso ao Banco de Dados e Regras
-├── Views/ # Interfaces (HTML/PHP)
-│   ├── auth/ # Login, Registro, Perfil
-│   ├── layouts/ # Cabeçalho e Rodapé reutilizáveis
-│   └── veiculos/ # Listagem, Detalhes e CRUD
+ ├── Controllers/   # Lógica de negócio (Usuario, Veiculo, Auth)
+ ├── Models/        # Acesso ao Banco de Dados e Regras
+ ├── Views/         # Interfaces (HTML/PHP)
+ │    ├── auth/     # Login, Registro, Perfil
+ │    ├── layouts/  # Cabeçalho e Rodapé reutilizáveis
+ │    └── veiculos/ # Listagem, Detalhes e CRUD
 /public
-├── css/ # Estilos globais (style.css)
-├── js/ # Scripts globais (main.js)
-└── img/ # Imagens do sistema
-└── uploads/ # Fotos dos veículos
+ ├── css/           # Estilos globais (style.css)
+ ├── js/            # Scripts globais (main.js)
+ ├── img/           # Imagens do sistema
+ └── uploads/       # Fotos dos veículos
+
 ```
 
 ---
@@ -67,20 +71,38 @@ O projeto foi organizado para facilitar a manutenção e escalabilidade:
 
 1. **Clone o repositório:**
 ```bash
-   git clone [https://github.com/SEU-USUARIO/autonivel.git](https://github.com/SEU-USUARIO/autonivel.git)
+git clone [https://github.com/SEU-USUARIO/autonivel.git](https://github.com/SEU-USUARIO/autonivel.git)
+
 ```
+
 
 2. **Configure o Banco de Dados:**
-   - Crie um banco de dados MySQL chamado `autonivel`.
-   - Importe o arquivo `database.sql` (disponível na raiz do projeto).
-   - Ajuste as credenciais em `src/config/database.php`.
+* Crie um banco de dados PostgreSQL chamado `db_autonivel`.
+* Importe o arquivo `database.sql` (disponível na raiz do projeto).
+* Ajuste as credenciais em `src/config/database.php`.
 
-3. **Inicie o Servidor:** Você pode usar o XAMPP, Laragon ou o servidor embutido do PHP:
+
+3. **Inicie o Servidor:**
+Você pode usar o XAMPP, Laragon ou o servidor embutido do PHP:
 ```bash
-   php -s localhost:8000 -t public
+php -S localhost:8000 -t public
+
 ```
 
-4. **Acesse:** Abra `http://localhost:8000` no seu navegador.
+
+4. **Acesse:**
+Abra `http://localhost:8000` no seu navegador.
+
+---
+
+##  Usuários para Teste
+
+Para facilitar a verificação das funcionalidades e níveis de acesso (ACL), o banco de dados já vem populado com os seguintes usuários:
+
+| Nível de Acesso | E-mail | Senha |
+| --- | --- | --- |
+| **Usuário Comum** | `teste@teste.com` | `123` |
+| **Administrador** | `admin@autonivel.com` | `123456` |
 
 ---
 
@@ -88,7 +110,9 @@ O projeto foi organizado para facilitar a manutenção e escalabilidade:
 
 Estudantes de Engenharia de Computação - IFMG
 
+**Gabriel Henrique Silva Duque**
 
-**Gabriel Henrique Silva Duque** 
 
-**Rafael Gonçalves Oliveira** 
+**Rafael Gonçalves Oliveira**
+
+
