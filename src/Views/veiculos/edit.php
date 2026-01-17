@@ -49,17 +49,29 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label fw-bold small text-uppercase">Foto do Veículo</label>
+                            <label class="form-label fw-bold small text-uppercase">Fotos Atuais (Galeria)</label>
                             
-                            <?php if($veiculo['url_foto']): ?>
-                                <div class="mb-2">
-                                    <img src="/<?= $veiculo['url_foto'] ?>" alt="Foto Atual" style="height: 100px; border-radius: 5px; border: 1px solid #ddd;">
-                                    <span class="text-muted small ms-2">Foto Atual</span>
-                                </div>
-                            <?php endif; ?>
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                <?php 
+                                // Buscamos todas as fotos para exibir na edição
+                                $veiculoModel = new Veiculo();
+                                $fotosAtuais = $veiculoModel->buscarFotos($veiculo['id']);
+                                
+                                if(!empty($fotosAtuais)): 
+                                    foreach($fotosAtuais as $foto): ?>
+                                        <div class="position-relative">
+                                            <img src="/public/<?= $foto['url_foto'] ?>" alt="Foto" style="height: 80px; width: 80px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd;">
+                                        </div>
+                                    <?php endforeach; 
+                                else: ?>
+                                    <p class="text-muted small">Nenhuma foto cadastrada.</p>
+                                <?php endif; ?>
+                            </div>
                             
-                            <input type="file" name="foto" class="form-control" accept="image/*">
-                            <div class="form-text">Deixe em branco para manter a foto atual.</div>
+                            <hr>
+                            <label class="form-label fw-bold small text-uppercase text-primary">Adicionar novas fotos</label>
+                            <input type="file" name="fotos[]" id="inputFotos" class="form-control" multiple accept="image/*">
+                            <div id="preview-fotos" class="form-text">As novas fotos serão adicionadas à galeria atual.</div>
                         </div>
 
                         <div class="d-grid gap-2">

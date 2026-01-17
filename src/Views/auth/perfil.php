@@ -90,7 +90,7 @@
 
             <div class="dado-linha">
                 <div class="dado-label">Telefone</div>
-                <input type="text" name="telefone" class="dado-input" value="<?= htmlspecialchars($_SESSION['telefone'] ?? '') ?>" placeholder="Telefone">
+                <input type="text" name="telefone" class="dado-input" maxlength="15" value="<?= htmlspecialchars($_SESSION['telefone'] ?? '') ?>" placeholder="Telefone">
             </div>
 
             <hr class="divisor-limpo"> <div class="dado-linha">

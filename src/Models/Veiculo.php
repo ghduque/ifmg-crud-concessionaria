@@ -22,8 +22,7 @@ class Veiculo {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // --- MÉTODO ATUALIZADO PARA MÚLTIPLAS FOTOS ---
-    // Recebe um array $fotos em vez de uma string única
+    // --- MÉTODO CADASTRAR (MANTIDO COM LOOP DE FOTOS) ---
     public function cadastrar($marca, $modelo, $ano_fab, $ano_mod, $valor, $km, $descricao, $fotos = []) {
         try {
             $this->conn->beginTransaction();
@@ -54,10 +53,68 @@ class Veiculo {
                     // A primeira foto (index 0) será o destaque/capa
                     $destaque = ($index === 0) ? 'true' : 'false';
                     
-                    $stmtFoto->bindParam(':id', $veiculoId);
-                    $stmtFoto->bindParam(':url', $urlFoto);
-                    $stmtFoto->bindParam(':destaque', $destaque);
-                    $stmtFoto->execute();
+                    $stmtFoto->execute([
+                        ':id' => $veiculoId,
+                        ':url' => $urlFoto,
+                        ':destaque' => $destaque
+                    ]);
+                }
+            }
+
+            $this->conn->commit();
+            return true;
+
+        } catch (Exception $e) {
+            $this->conn->rollBack();
+            return false;
+        }
+    }
+
+    // --- MÉTODO ATUALIZAR (AGORA SUPORTA MÚLTIPLAS FOTOS) ---
+    public function atualizar($id, $marca, $modelo, $ano_fab, $ano_mod, $valor, $km, $descricao, $novasFotos = []) {
+        try {
+            $this->conn->beginTransaction();
+
+            // 1. Atualiza os dados principais
+            $query = "UPDATE veiculos 
+                      SET marca = :marca, modelo = :modelo, ano_fabricacao = :ano_fab, 
+                          ano_modelo = :ano_mod, valor = :valor, km = :km, descricao = :descricao 
+                      WHERE id = :id";
+            
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([
+                ':marca' => $marca,
+                ':modelo' => $modelo,
+                ':ano_fab' => $ano_fab,
+                ':ano_mod' => $ano_mod,
+                ':valor' => $valor,
+                ':km' => $km,
+                ':descricao' => $descricao,
+                ':id' => $id
+            ]);
+
+            // 2. Se enviou novas fotos, adiciona à galeria
+            if (!empty($novasFotos) && is_array($novasFotos)) {
+                // Opcional: Se quiser que a primeira foto nova vire a CAPA, 
+                // descomente as linhas abaixo para resetar os destaques antigos:
+                /*
+                $queryReset = "UPDATE veiculos_fotos SET destaque = false WHERE veiculo_id = :id";
+                $stmtReset = $this->conn->prepare($queryReset);
+                $stmtReset->execute([':id' => $id]);
+                */
+
+                $queryInsert = "INSERT INTO veiculos_fotos (veiculo_id, url_foto, destaque) VALUES (:id, :url, :destaque)";
+                $stmtInsert = $this->conn->prepare($queryInsert);
+
+                foreach ($novasFotos as $index => $urlFoto) {
+                    // Aqui definimos como false para não bagunçar a capa atual, 
+                    // a menos que você tenha descomentado o reset acima.
+                    $destaque = 'false'; 
+                    $stmtInsert->execute([
+                        ':id' => $id,
+                        ':url' => $urlFoto,
+                        ':destaque' => $destaque
+                    ]);
                 }
             }
 
@@ -85,14 +142,13 @@ class Veiculo {
         return $stmt->execute();
     }
 
-    // Busca um único veículo pelo ID
     public function buscarPorId($id) {
         $query = "SELECT v.*, f.url_foto 
                   FROM veiculos v 
                   LEFT JOIN veiculos_fotos f ON v.id = f.veiculo_id 
                   WHERE v.id = :id 
                   ORDER BY f.destaque DESC 
-                  LIMIT 1"; // Pega a foto destaque como capa
+                  LIMIT 1";
                   
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id);
@@ -100,61 +156,12 @@ class Veiculo {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Busca TODAS as fotos de um veículo (Para o Carrossel)
     public function buscarFotos($veiculoId) {
         $query = "SELECT url_foto FROM veiculos_fotos WHERE veiculo_id = :id ORDER BY id ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $veiculoId);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    // Atualiza os dados do veículo (Edição)
-    // Mantive a lógica original para edição por enquanto (troca a foto principal)
-    public function atualizar($id, $marca, $modelo, $ano_fab, $ano_mod, $valor, $km, $descricao, $novaFoto = null) {
-        try {
-            $this->conn->beginTransaction();
-
-            // 1. Atualiza os dados principais
-            $query = "UPDATE veiculos 
-                      SET marca = :marca, modelo = :modelo, ano_fabricacao = :ano_fab, 
-                          ano_modelo = :ano_mod, valor = :valor, km = :km, descricao = :descricao 
-                      WHERE id = :id";
-            
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':marca', $marca);
-            $stmt->bindParam(':modelo', $modelo);
-            $stmt->bindParam(':ano_fab', $ano_fab);
-            $stmt->bindParam(':ano_mod', $ano_mod);
-            $stmt->bindParam(':valor', $valor);
-            $stmt->bindParam(':km', $km);
-            $stmt->bindParam(':descricao', $descricao);
-            $stmt->bindParam(':id', $id);
-            $stmt->execute();
-
-            // 2. Se enviou uma nova foto, atualiza a tabela de fotos (substitui capa)
-            if ($novaFoto) {
-                // Tira o destaque de todas as fotos anteriores desse carro
-                $queryReset = "UPDATE veiculos_fotos SET destaque = false WHERE veiculo_id = :id";
-                $stmtReset = $this->conn->prepare($queryReset);
-                $stmtReset->bindParam(':id', $id);
-                $stmtReset->execute();
-
-                // Insere a nova foto como destaque
-                $queryInsert = "INSERT INTO veiculos_fotos (veiculo_id, url_foto, destaque) VALUES (:id, :url, true)";
-                $stmtInsert = $this->conn->prepare($queryInsert);
-                $stmtInsert->bindParam(':id', $id);
-                $stmtInsert->bindParam(':url', $novaFoto);
-                $stmtInsert->execute();
-            }
-
-            $this->conn->commit();
-            return true;
-
-        } catch (Exception $e) {
-            $this->conn->rollBack();
-            return false;
-        }
     }
 
     public function listarComFiltros($filtros) {
@@ -218,4 +225,3 @@ class Veiculo {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
-?>

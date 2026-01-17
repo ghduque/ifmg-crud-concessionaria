@@ -43,36 +43,10 @@ class VeiculoController {
             $km = $_POST['km'];
             $descricao = $_POST['descricao'];
             
-            // Array para guardar os caminhos das várias fotos
-            $caminhosFotos = [];
-
-            // Verifica se o campo 'fotos' (do input multiple) foi enviado
-            if (isset($_FILES['fotos']) && !empty($_FILES['fotos']['name'][0])) {
-                
-                // Conta quantos arquivos vieram
-                $totalArquivos = count($_FILES['fotos']['name']);
-
-                for ($i = 0; $i < $totalArquivos; $i++) {
-                    // Verifica se não deu erro no upload deste arquivo específico
-                    if ($_FILES['fotos']['error'][$i] === 0) {
-                        
-                        $extensao = pathinfo($_FILES['fotos']['name'][$i], PATHINFO_EXTENSION);
-                        // Cria nome único: id_unico-indice.extensao
-                        $novoNome = uniqid() . "-" . $i . "." . $extensao;
-                        $destino = __DIR__ . '/../../public/uploads/' . $novoNome;
-                        
-                        // Move o arquivo para a pasta uploads
-                        if (move_uploaded_file($_FILES['fotos']['tmp_name'][$i], $destino)) {
-                            $caminhosFotos[] = 'uploads/' . $novoNome;
-                        }
-                    }
-                }
-            }
+            // Usamos a função auxiliar para processar os uploads
+            $caminhosFotos = $this->uploadArquivos($_FILES['fotos']);
 
             $veiculoModel = new Veiculo();
-            
-            // Agora passamos o ARRAY $caminhosFotos em vez de uma string única
-            // Certifique-se que seu Model Veiculo -> cadastrar() já está atualizado para receber array
             $veiculoModel->cadastrar($marca, $modelo, $ano_fabricacao, $ano_modelo, $valor, $km, $descricao, $caminhosFotos);
 
             header('Location: /veiculos'); 
@@ -100,7 +74,7 @@ class VeiculoController {
         require_once __DIR__ . '/../Views/veiculos/edit.php';
     }
 
-    // Atualiza os dados (Edição)
+    // --- ATUALIZADO: Agora o Update também aceita múltiplas fotos ---
     public function update() {
         $this->verificarAdmin();
 
@@ -114,25 +88,37 @@ class VeiculoController {
             $km = $_POST['km'];
             $descricao = $_POST['descricao'];
             
-            // Lógica de Upload para Edição (Por enquanto, substitui a foto principal)
-            // Se quiser adicionar mais fotos na edição, precisaremos de uma lógica mais complexa depois
-            $caminhoFoto = null;
-            if (isset($_FILES['foto']) && $_FILES['foto']['error'] === 0) {
-                $extensao = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
-                $novoNome = uniqid() . "." . $extensao;
-                $destino = __DIR__ . '/../../public/uploads/' . $novoNome;
-                
-                if (move_uploaded_file($_FILES['foto']['tmp_name'], $destino)) {
-                    $caminhoFoto = 'uploads/' . $novoNome;
-                }
-            }
+            // Captura novas fotos se foram enviadas (input name="fotos[]")
+            $novasFotos = $this->uploadArquivos($_FILES['fotos']);
 
             $veiculoModel = new Veiculo();
-            $veiculoModel->atualizar($id, $marca, $modelo, $ano_fabricacao, $ano_modelo, $valor, $km, $descricao, $caminhoFoto);
+            // Passamos o array de novas fotos para o seu Model
+            $veiculoModel->atualizar($id, $marca, $modelo, $ano_fabricacao, $ano_modelo, $valor, $km, $descricao, $novasFotos);
 
             header('Location: /veiculos');
             exit;
         }
+    }
+
+    // --- FUNÇÃO AUXILIAR: Unifica a lógica de upload para STORE e UPDATE ---
+    private function uploadArquivos($arquivos) {
+        $caminhos = [];
+        if (isset($arquivos) && !empty($arquivos['name'][0])) {
+            $totalArquivos = count($arquivos['name']);
+
+            for ($i = 0; $i < $totalArquivos; $i++) {
+                if ($arquivos['error'][$i] === 0) {
+                    $extensao = pathinfo($arquivos['name'][$i], PATHINFO_EXTENSION);
+                    $novoNome = uniqid() . "-" . $i . "." . $extensao;
+                    $destino = __DIR__ . '/../../public/uploads/' . $novoNome;
+                    
+                    if (move_uploaded_file($arquivos['tmp_name'][$i], $destino)) {
+                        $caminhos[] = 'uploads/' . $novoNome;
+                    }
+                }
+            }
+        }
+        return $caminhos;
     }
 
     // Deleta um veículo
@@ -183,4 +169,3 @@ class VeiculoController {
         require_once __DIR__ . '/../Views/veiculos/details.php';
     }
 }
-?>

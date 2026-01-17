@@ -40,6 +40,11 @@
                         </div>
                     </div>
 
+                    <div class="mb-3">
+                        <label class="form-label">Descrição / Observações</label>
+                        <textarea name="descricao" class="form-control" rows="3" placeholder="Opcional"></textarea>
+                    </div>
+
                     <div class="mb-4">
                         <label class="form-label fw-bold small text-uppercase">Fotos do Veículo</label>
 
@@ -47,7 +52,9 @@
                             <input type="file" name="fotos[]" class="form-control" id="inputFotos" multiple accept="image/*">
                             <label class="input-group-text" for="inputFotos">Selecionar</label>
                         </div>
-                        <div class="form-text">Segure a tecla <b>Ctrl</b> para selecionar várias fotos de uma vez.</div>
+                        <div id="preview-fotos" class="form-text">
+                            Selecione uma ou mais fotos da galeria.
+                        </div>
                     </div>
 
                     <button type="submit" class="btn btn-success w-100">Salvar Veículo</button>

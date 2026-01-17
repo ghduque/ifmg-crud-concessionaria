@@ -3,7 +3,7 @@ class Database {
     private $host = 'localhost';
     private $db_name = 'db_autonivel';
     private $username = 'postgres';
-    private $password = '080552';
+    private $password = '1512';
     public $conn;
 
     public function getConnection() {
