@@ -63,7 +63,7 @@ O projeto foi organizado para facilitar a manutenção e escalabilidade:
 
 ---
 
-## 🎯 Como Executar
+##  Como Executar
 
 1. **Clone o repositório:**
 ```bash
@@ -84,7 +84,7 @@ O projeto foi organizado para facilitar a manutenção e escalabilidade:
 
 ---
 
-## 👨‍💻 Autores
+##  Autores
 
 Estudantes de Engenharia de Computação - IFMG
 
