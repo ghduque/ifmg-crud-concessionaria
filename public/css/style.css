@@ -1,212 +1,451 @@
-/* =========================================
-   TEMA AMARELO E PRETO - AUTONÍVEL
-   ========================================= */
+/* ==========================================================================
+   ARQUIVO DE ESTILOS GERAIS - AUTONÍVEL
+   Organização: Variáveis Globais > Layout > Páginas Específicas
+   ========================================================================== */
 
-/* Fonte mais moderna */
-body {
-    font-family: 'Montserrat', sans-serif;
-    background-color: #121212; /* Fundo preto caso a imagem não carregue */
+/* --------------------------------------------------------------------------
+   1. VARIÁVEIS E RESET GLOBAL
+   Uso: Todo o sistema
+   -------------------------------------------------------------------------- 
+*/
+
+:root {
+    --tema-amarelo: #F4D03F;
+    --tema-amarelo-escuro: #d4b42e;
+    --tema-preto: #121212;
 }
 
-/* --- Configuração da Página de Login Tela Cheia --- */
-.login-page {
-    /* Mantemos a imagem do carro escuro, pois combina com o tema */
-    background-image: url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1920&auto=format&fit=crop');
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #ffffff; /* Cor padrão, alterada em páginas específicas */
+    color: #212529;
+}
+
+/* Utilitário: Espaçamento de letras */
+.ls-2 {
+    letter-spacing: 2px;
+}
+
+/* Utilitário: Texto Amarelo (Sobrescreve Bootstrap) */
+.text-primary {
+    color: var(--tema-amarelo) !important;
+}
+
+/* --------------------------------------------------------------------------
+   2. CABEÇALHO / HEADER
+   Arquivo: src/Views/layouts/cabecalho.php
+   -------------------------------------------------------------------------- 
+*/
+
+.header-principal {
+    min-height: 150px;
+    position: relative !important;
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    background-color: #000;
+    border-bottom: 1px solid #6c757d;
+}
+
+/* Link e Imagem da Logo */
+.header-logo-link {
+    text-decoration: none;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.header-logo-img {
+    width: 50%;
+    height: auto;
+    display: block;
+    min-height: 80px;
+    max-width: 600px;
+}
+
+/* Área do Usuário (Avatar e Dropdown) */
+.user-avatar-circle {
+    width: 28px;
+    height: 28px;
+}
+
+.dropdown-item {
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #212529;
+    color: #ffc107 !important;
+    padding-left: 20px;
+}
+
+/* Links do menu com efeito Hover Amarelo */
+.hover-warning:hover {
+    color: #ffc107 !important;
+    transition: 0.3s;
+}
+
+/* Botão "Anunciar" (Admin) */
+.btn-anunciar-header {
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+
+/* --------------------------------------------------------------------------
+   3. RODAPÉ / FOOTER
+   Arquivo: src/Views/layouts/rodape.php
+   -------------------------------------------------------------------------- 
+*/
+
+/* Container arredondado do mapa */
+.footer-map-container {
+    height: 120px;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+}
+
+.footer-map-iframe {
+    border: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Responsividade do mapa no celular */
+@media (max-width: 768px) {
+    .footer-map-container {
+        height: 150px;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   4. PÁGINAS DE LOGIN E CADASTRO (AUTENTICAÇÃO)
+   Arquivos: src/Views/auth/login.php e register.php
+   -------------------------------------------------------------------------- 
+*/
+
+/* Fundo da tela cheia com imagem de carro */
+body.login-page {
+    background-image: url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1920&q=80');
     background-size: cover;
     background-position: center;
-    background-attachment: fixed;
+    background-repeat: no-repeat;
     height: 100vh;
     width: 100%;
     overflow: hidden;
     position: relative;
+    background-attachment: fixed;
 }
 
-/* Camada preta transparente mais intensa para destacar o amarelo */
-.overlay {
+/* Camada escura sobre a foto para destacar o texto */
+.login-page .overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    /* Gradiente reforçando o preto na esquerda onde está o texto */
     background: linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 100%);
     z-index: 1;
 }
 
-/* --- Estilização do Cartão de Login --- */
+/* Cartão do formulário */
 .login-card {
-    /* Borda direita sutilmente amarela */
-    border-right: 2px solid rgba(244, 208, 63, 0.5);
+    border-right: 2px solid rgba(244, 208, 63, 0.5); /* Detalhe amarelo sutil */
+    position: relative;
+    z-index: 2;
 }
 
-.ls-2 {
-    letter-spacing: 2px;
-}
-
-/* --- SUBSTITUIÇÃO DE CORES (Overriding Bootstrap) --- */
-
-/* Definindo a cor Amarela Principal */
-:root {
-    --tema-amarelo: #F4D03F;
-    --tema-amarelo-escuro: #d4b42e;
-}
-
-/* Força o texto que usava "text-primary" (azul) a ficar amarelo */
-.text-primary {
-    color: var(--tema-amarelo) !important;
-}
-
-/* Força os rótulos (labels) a ficarem amarelos também */
+/* Labels do formulário de login */
 .login-card .form-label {
     color: var(--tema-amarelo) !important;
     font-weight: 600;
 }
 
-
-/* --- Inputs Customizados (Escuros com foco Amarelo) --- */
+/* Inputs Escuros Customizados */
 .form-control-dark {
-    background-color: rgba(0, 0, 0, 0.5); /* Fundo mais preto */
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Borda sutil inicial */
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: #fff;
-    border-radius: 0; /* Bordas quadradas */
-    padding: 15px;
-    transition: all 0.3s;
+    border-radius: 8px;
+    padding: 12px;
 }
 
 .form-control-dark:focus {
     background-color: rgba(0, 0, 0, 0.8);
-    border-color: var(--tema-amarelo); /* Borda AMARELA no foco */
-    color: var(--tema-amarelo); /* Texto digitado fica amarelo */
-    box-shadow: 0 0 15px rgba(244, 208, 63, 0.3); /* Brilho amarelo */
+    border-color: var(--tema-amarelo);
+    color: var(--tema-amarelo);
+    box-shadow: 0 0 15px rgba(244, 208, 63, 0.3);
 }
 
 .form-control-dark::placeholder {
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.5);
 }
 
-
-/* --- Botão Principal (Amarelo com texto Preto) --- */
+/* Botão Principal (Amarelo) */
 .btn-primary {
-    border-radius: 0;
     background-color: var(--tema-amarelo);
-    color: #000; /* Texto preto para contraste máximo */
-    font-weight: 800; /* Texto mais grosso */
+    color: #000;
+    font-weight: 800;
     border: none;
-    transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
+    transition: all 0.3s ease;
 }
 
-.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+.btn-primary:hover {
     background-color: var(--tema-amarelo-escuro) !important;
     color: #000 !important;
-    transform: translateY(-3px) scale(1.02); /* Efeito de "pulo" maior */
-    box-shadow: 0 10px 20px -10px rgba(244, 208, 63, 0.5); /* Sombra amarela */
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -10px rgba(244, 208, 63, 0.5);
 }
 
-/* Ajuste no link "Voltar ao site" para ficar amarelado no hover */
+/* Link "Voltar para a Loja" */
 .login-card a.text-white-50:hover {
     color: var(--tema-amarelo) !important;
 }
 
-/* --- NAVBAR & LOGO --- */
-.navbar {
-    background-color: #000 !important; /* Preto absoluto no topo */
-    border-bottom: 1px solid #333;
-    padding: 15px 0;
-}
+/* --------------------------------------------------------------------------
+   5. LISTAGEM DE VEÍCULOS (ESTOQUE)
+   Arquivo: src/Views/veiculos/index.php
+   -------------------------------------------------------------------------- 
+*/
 
-.navbar-brand img {
-    max-height: 50px; /* Ajuste conforme necessário para a logo não estourar */
-    width: auto;
-}
-
-.nav-link {
+/* Filtros Laterais (Inputs Escuros) */
+.input-filtro {
+    background-color: #212529 !important;
+    border: 1px solid #495057 !important;
     color: #fff !important;
-    text-transform: uppercase;
-    font-size: 0.9rem;
-    letter-spacing: 1px;
-    transition: color 0.3s;
 }
 
-.nav-link:hover {
-    color: var(--tema-amarelo) !important;
+.input-filtro::placeholder {
+    color: rgba(255, 255, 255, 0.7) !important;
 }
 
-/* --- CARD DE VEÍCULO (PREMIUM) --- */
+.input-filtro:focus {
+    background-color: #000 !important;
+    border-color: #0d6efd !important;
+    color: #fff !important;
+    box-shadow: none !important;
+}
+
+/* Cards dos Veículos na Listagem */
 .card-veiculo {
-    background-color: #1a1a1a; /* Cinza muito escuro */
-    border: none;
-    transition: transform 0.3s, box-shadow 0.3s;
+    background-color: #fff;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-radius: 12px;
+    overflow: hidden;
     height: 100%;
 }
 
 .card-veiculo:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     border-bottom: 3px solid var(--tema-amarelo);
 }
 
 .card-img-wrapper {
-    position: relative;
+    height: 200px;
     overflow: hidden;
-    height: 220px;
+    position: relative;
 }
 
 .card-img-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
     transition: transform 0.5s;
 }
 
 .card-veiculo:hover .card-img-wrapper img {
-    transform: scale(1.1); /* Zoom suave na foto ao passar o mouse */
+    transform: scale(1.1); /* Zoom na imagem ao passar o mouse */
 }
 
 .card-price {
-    color: var(--tema-amarelo);
-    font-size: 1.5rem;
+    color: #212529; /* Preço escuro no fundo branco */
     font-weight: 800;
 }
 
-.card-title {
-    color: #fff;
-    font-weight: 600;
-    text-transform: uppercase;
+/* --------------------------------------------------------------------------
+   6. DETALHES DO VEÍCULO
+   Arquivo: src/Views/veiculos/details.php
+   -------------------------------------------------------------------------- 
+*/
+
+/* Cards da página de detalhes */
+.card-detalhe {
+    background-color: #ffffff;
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border-radius: 12px;
 }
 
-.card-info {
-    color: #aaa;
+/* Carrossel de imagens */
+.carousel-detalhe-img {
+    height: 550px;
+    object-fit: cover;
+    width: 100%;
+    border-radius: 12px;
+}
+
+.carousel-control-icon-bg {
+    background-color: rgba(0,0,0,0.5); 
+    border-radius: 50%;
+}
+
+/* Grid de Opcionais (Ícones) */
+.opcional-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: #fdfdfd;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.opcional-item:hover {
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    transform: translateY(-2px);
+}
+
+.opcional-icon {
+    width: 35px;
+    height: 35px;
+    background-color: #f1f3f5;
+    color: #8B1A2E; /* Vinho/Bordô */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    font-size: 14px;
+}
+
+.opcional-text {
     font-size: 0.9rem;
-    border-top: 1px solid #333;
-    padding-top: 10px;
-    margin-top: 10px;
+    font-weight: 500;
+    color: #495057;
 }
 
-/* Garante que o header tenha uma altura fixa e não deixe o estoque subir */
-header {
-    min-height: 100px;
-    padding-bottom: 20px;
-    display: block;
-    clear: both; /* Limpa qualquer flutuação que o botão anunciar cause */
+/* Preço em destaque na lateral */
+.preco-destaque {
+    color: #212529; 
+    font-size: 2.6rem;
+    font-weight: bold;
 }
 
-/* Espaçamento extra na página de estoque apenas quando for Admin */
-.admin-logado .estoque-container {
-    margin-top: 40px; 
+.badge-ano {
+    background-color: #212529;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    display: inline-block;
 }
 
-/* Reduz o espaço entre as linhas para ficar mais compacto */
+/* Botões de WhatsApp */
+.btn-whatsapp-socio {
+    background-color: #25d366 !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 700 !important;
+    transition: all 0.3s ease;
+}
+
+.btn-whatsapp-socio:hover {
+    background-color: #128C7E !important;
+    transform: translateY(-2px);
+    color: white !important;
+}
+
+.rounded-pill-custom {
+    border-radius: 50px !important;
+}
+
+/* Card fixo na rolagem */
+.sticky-details {
+    position: sticky;
+    top: 20px;
+    z-index: 10;
+}
+
+.text-secondary-custom {
+    color: #6c757d !important;
+}
+
+/* --------------------------------------------------------------------------
+   7. PERFIL DO USUÁRIO
+   Arquivo: src/Views/auth/perfil.php
+   -------------------------------------------------------------------------- 
+*/
+
+.perfil-container {
+    max-width: 700px;
+    margin: 20px auto;
+    padding: 10px 20px;
+}
+
+.secao-titulo {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: #000;
+    display: flex;
+    align-items: center;
+}
+
+.secao-titulo i {
+    color: var(--tema-amarelo);
+    margin-right: 15px;
+}
+
+/* Estilo de Formulário Compacto (Linhas) */
 .dado-linha {
     display: flex;
     align-items: center;
-    margin-bottom: 20px; /* Espaço reduzido de 30px para 20px */
+    margin-bottom: 10px;
+    padding: 5px 0;
 }
 
-/* Remove qualquer margem extra que o HR possa estar criando */
-hr.divisor-compacto {
-    margin: 10px 0 25px 0;
+.dado-label {
+    width: 140px;
+    font-weight: 600;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.dado-input {
+    flex: 1;
+    border: none;
+    border-bottom: 1px solid #eee;
+    padding: 5px 0;
+    font-size: 1rem;
+    background: transparent;
+    color: #212529;
+}
+
+.dado-input:focus {
+    outline: none;
+    border-bottom: 2px solid var(--tema-amarelo);
+}
+
+/* Divisória minimalista */
+.divisor-limpo {
     border: 0;
-    border-top: 1px solid #eee;
+    border-top: 1px solid #f8f8f8;
+    margin: 10px 0;
+}
+
+/* Botão de Editar Perfil */
+.btn-editar {
+    background-color: #000;
+    color: #fff;
+    padding: 10px 60px;
+    border-radius: 50px;
+    font-weight: 700;
+    border: none;
+    margin-top: 20px;
+    transition: 0.3s;
+}
+
+.btn-editar:hover {
+    background-color: var(--tema-amarelo);
+    color: #000;
 }

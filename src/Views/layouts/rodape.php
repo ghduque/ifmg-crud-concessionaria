@@ -45,12 +45,11 @@
 
             <div class="col-md-3 text-center text-md-end">
                 <h6 class="text-uppercase fw-bold text-white mb-3">Onde Estamos</h6>
-                <div class="rounded overflow-hidden shadow-sm" style="height: 120px;">
+                
+                <div class="footer-map-container">
                     <iframe 
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d935.5554525891041!2d-45.54029827153604!3d-20.29108399881884!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94b488c0a963191f%3A0x1a6c5dd6cbbdd45e!2sAUTON%C3%8DVEL%20MULTIMARCAS!5e0!3m2!1spt-BR!2sbr!4v1768568127476!5m2!1spt-BR!2sbr" 
-                        width="100%" 
-                        height="100%" 
-                        style="border:0;" 
+                        class="footer-map-iframe"
                         allowfullscreen="" 
                         loading="lazy" 
                         referrerpolicy="no-referrer-when-downgrade">
@@ -62,18 +61,8 @@
     </div>
 </footer>
 
-<style>
-    .hover-warning:hover {
-        color: #ffc107 !important; /* Amarelo conforme solicitado */
-        transition: color 0.3s;
-    }
-    /* Ajuste para o mapa não ficar muito grande em telas menores */
-    @media (max-width: 768px) {
-        iframe { height: 150px; }
-    }
-</style>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script src="/js/main.js"></script>
 
 </body>

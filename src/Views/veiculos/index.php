@@ -1,39 +1,5 @@
 <?php include __DIR__ . '/../layouts/cabecalho.php'; ?>
 
-<style>
-    /* Fundo geral da página */
-    body { background-color: #f5f7fa !important; color: #333 !important; }
-
-    /* Estilo dos Inputs do Filtro */
-    .input-filtro {
-        background-color: #212529 !important;
-        border: 1px solid #495057 !important;
-        color: #fff !important;
-    }
-    
-    .input-filtro::placeholder { color: rgba(255, 255, 255, 0.7) !important; }
-    
-    .input-filtro:focus {
-        background-color: #000 !important;
-        border-color: #0d6efd !important;
-        color: #fff !important;
-        box-shadow: none !important;
-    }
-
-    /* Card dos Carros */
-    .card-veiculo {
-        background-color: #fff !important;
-        transition: transform 0.2s, box-shadow 0.2s;
-        border-radius: 12px;
-        overflow: hidden;
-    }
-    .card-veiculo:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-    }
-    .object-fit-cover { object-fit: cover; }
-</style>
-
 <div class="container py-4">
 
     <?php if (isset($_SESSION['flash_sucesso'])): ?>
@@ -118,7 +84,6 @@
                 
                 <div class="d-flex align-items-center">
                     <label class="text-muted small me-2 d-none d-md-block">Ordenar por:</label>
-                    
                     <select class="form-select form-select-sm border-secondary text-dark" style="width: auto;" id="ordenacaoVeiculos">
                         <option value="recente" <?= ($_GET['ordem'] ?? '') == 'recente' ? 'selected' : '' ?>>Mais Recentes</option>
                         <option value="menor_preco" <?= ($_GET['ordem'] ?? '') == 'menor_preco' ? 'selected' : '' ?>>Menor Preço</option>
@@ -179,6 +144,5 @@
         </main>
     </div>
 </div>
-<script src="/js/main.js"></script>
 
 <?php include __DIR__ . '/../layouts/rodape.php'; ?>

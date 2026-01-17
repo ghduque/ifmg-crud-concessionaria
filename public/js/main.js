@@ -1,117 +1,73 @@
-// public/js/main.js
+/* ==========================================================================
+   ARQUIVO JAVASCRIPT PRINCIPAL - AUTONÍVEL
+   Organização: Funções Utilitárias > Inicialização por Módulo
+   ========================================================================== */
 
-function mascaraCPF(i) {
-    var v = i.value;
-    
-    // Remove tudo o que não é dígito
-    v = v.replace(/\D/g, ""); 
-    
-    // Coloca os pontos e o traço
-    v = v.replace(/(\d{3})(\d)/, "$1.$2");
-    v = v.replace(/(\d{3})(\d)/, "$1.$2");
-    v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-    
-    i.value = v;
-}
+/* --------------------------------------------------------------------------
+   1. FUNÇÕES DE MÁSCARA (FORMATAÇÃO DE INPUTS)
+   Uso: Chamadas automaticamente nos eventos de input
+   -------------------------------------------------------------------------- */
 
-function mascaraTelefone(i) {
-    var v = i.value;
-    
-    // Remove tudo o que não é dígito
-    v = v.replace(/\D/g, "");
-    
-    // Coloca parênteses e traço (Celular 11 dígitos ou Fixo 10)
-    v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
-    v = v.replace(/(\d{5})(\d{4})$/, "$1-$2");
-    
-    i.value = v;
-}
-
-// Ativa as máscaras automaticamente quando a página carregar
-document.addEventListener("DOMContentLoaded", function() {
-    const inputCPF = document.querySelector('input[name="cpf"]');
-    const inputTel = document.querySelector('input[name="telefone"]');
-
-    if(inputCPF) {
-        inputCPF.addEventListener('input', function() { mascaraCPF(this); });
-    }
-    
-    if(inputTel) {
-        inputTel.addEventListener('input', function() { mascaraTelefone(this); });
-    }
-});
-
-function mascaraTelefone(input) {
+// Máscara para CPF: 000.000.000-00
+function mascaraCPF(input) {
     let v = input.value;
     
-    // 1. Remove tudo que não for número imediatamente
-    v = v.replace(/\D/g, "");
+    v = v.replace(/\D/g, "");                    // Remove tudo o que não é dígito
+    v = v.replace(/(\d{3})(\d)/, "$1.$2");       // Coloca um ponto entre o terceiro e o quarto dígitos
+    v = v.replace(/(\d{3})(\d)/, "$1.$2");       // Coloca um ponto entre o terceiro e o quarto dígitos de novo
+    v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2"); // Coloca um hífen entre o terceiro e o quarto dígitos
+    
+    input.value = v;
+}
 
-    // 2. Impede que tenha mais de 11 dígitos (DDD + 9 números)
-    if (v.length > 11) {
-        v = v.slice(0, 11);
-    }
+// Máscara para Telefone (Híbrida: Fixo 10 dígitos / Celular 11 dígitos)
+function mascaraTelefone(input) {
+    let v = input.value.replace(/\D/g, ""); // Remove tudo que não for número
+    
+    // Limita a 11 dígitos
+    if (v.length > 11) v = v.slice(0, 11);
 
-    // 3. Aplica a máscara visual para facilitar a leitura
+    // Lógica incremental para formatar enquanto digita
     if (v.length > 10) {
         // Formato Celular: (11) 98888-7777
         v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, "($1) $2-$3");
     } else if (v.length > 5) {
-        // Formato Fixo: (11) 8888-7777
+        // Formato Fixo/Parcial: (11) 8888-7777
         v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, "($1) $2-$3");
     } else if (v.length > 2) {
+        // Apenas DDD: (11) 9...
         v = v.replace(/^(\d{2})(\d{0,5}).*/, "($1) $2");
     } else if (v.length > 0) {
+        // Início: (1...
         v = v.replace(/^(\d{0,2}).*/, "($1");
     }
 
     input.value = v;
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Mascara de Telefone (conforme solicitado anteriormente)
-    const inputTelefone = document.getElementById('telefone');
-    if (inputTelefone) {
-        inputTelefone.addEventListener('input', function() {
-            mascaraTelefone(this);
-        });
-    }
 
-    // Feedback de Fotos Selecionadas (PC e Celular)
-    const inputFotos = document.getElementById('inputFotos');
-    const preview = document.getElementById('preview-fotos');
+/* --------------------------------------------------------------------------
+   2. INICIALIZAÇÃO DO DOM (QUANDO A PÁGINA CARREGA)
+   Uso: Detecta elementos na tela e aplica os eventos
+   -------------------------------------------------------------------------- */
 
-    if (inputFotos && preview) {
-        inputFotos.addEventListener('change', function() {
-            const qtd = this.files.length;
-            if (qtd > 0) {
-                preview.innerHTML = `<b class="text-success">✓ ${qtd} foto(s) selecionada(s).</b>`;
-            } else {
-                preview.innerHTML = "Nenhuma foto selecionada.";
-            }
-        });
-    }
-});
-
-function mascaraTelefone(input) {
-    let v = input.value.replace(/\D/g, "");
-    if (v.length > 11) v = v.slice(0, 11);
-    if (v.length > 10) {
-        v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, "($1) $2-$3");
-    } else if (v.length > 5) {
-        v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, "($1) $2-$3");
-    } else if (v.length > 2) {
-        v = v.replace(/^(\d{2})(\d{0,5}).*/, "($1) $2");
-    } else if (v.length > 0) {
-        v = v.replace(/^(\d{0,2}).*/, "($1");
-    }
-    input.value = v;
-}
-
-/* Lógica da Página de Login */
 document.addEventListener("DOMContentLoaded", function() {
-    // Verifica se estamos na página de login procurando pelo formulário específico
-    // ou podemos verificar pela URL, mas verificar a existência dos campos é mais seguro
+
+    /* --- MÓDULO: APLICAÇÃO DE MÁSCARAS --- */
+    // Procura por inputs pelo 'name' para ser mais genérico e funcionar em Cadastro, Perfil e Criar Veículo
+    const inputCPF = document.querySelector('input[name="cpf"]');
+    const inputTel = document.querySelector('input[name="telefone"]');
+
+    if (inputCPF) {
+        inputCPF.addEventListener('input', function() { mascaraCPF(this); });
+    }
+    
+    if (inputTel) {
+        inputTel.addEventListener('input', function() { mascaraTelefone(this); });
+    }
+
+
+    /* --- MÓDULO: LOGIN (LIMPEZA DE ESPAÇOS) --- */
     const loginForm = document.querySelector('form[action="/login/auth"]');
     
     if (loginForm) {
@@ -124,7 +80,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
 
-        // Eventos de Blur e Paste
+        // Limpa ao sair do campo (Blur) e ao colar (Paste)
         if (emailInput) {
             emailInput.addEventListener('blur', function() { limparCampo(this); });
             emailInput.addEventListener('paste', function() { 
@@ -136,27 +92,45 @@ document.addEventListener("DOMContentLoaded", function() {
             senhaInput.addEventListener('blur', function() { limparCampo(this); });
         }
 
-        // Evento de Submit
+        // Garante a limpeza no momento do envio
         loginForm.addEventListener('submit', function(event) {
             limparCampo(emailInput);
             limparCampo(senhaInput);
         });
     }
-});
 
-/* Lógica de Ordenação de Veículos (index.php) */
-document.addEventListener("DOMContentLoaded", function() {
-    // Procura o select pelo ID que vamos adicionar no HTML
+
+    /* --- MÓDULO: VEÍCULOS (ORDENAÇÃO NA LISTAGEM) --- */
+    // Arquivo: src/Views/veiculos/index.php
     const selectOrdenacao = document.getElementById('ordenacaoVeiculos');
 
     if (selectOrdenacao) {
         selectOrdenacao.addEventListener('change', function() {
             const valor = this.value;
             
-            // Lógica para atualizar a URL mantendo os outros filtros
+            // Atualiza a URL mantendo os filtros de busca existentes
             const urlParams = new URLSearchParams(window.location.search);
             urlParams.set('ordem', valor);
             window.location.search = urlParams.toString();
         });
     }
+
+
+    /* --- MÓDULO: VEÍCULOS (PREVIEW DE FOTOS NO CADASTRO) --- */
+    // Arquivo: src/Views/veiculos/create.php
+    const inputFotos = document.getElementById('inputFotos');
+    const preview = document.getElementById('preview-fotos');
+
+    if (inputFotos && preview) {
+        inputFotos.addEventListener('change', function() {
+            const qtd = this.files.length;
+            if (qtd > 0) {
+                // Feedback visual verde e negrito
+                preview.innerHTML = `<b class="text-success">✓ ${qtd} foto(s) selecionada(s).</b>`;
+            } else {
+                preview.innerHTML = "Nenhuma foto selecionada.";
+            }
+        });
+    }
+
 });
