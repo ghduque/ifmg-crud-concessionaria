@@ -22,11 +22,16 @@ O **AutoNível** é um sistema web completo para gerenciamento de estoque de ve�
 - **Controle de Acesso (ACL):** Diferenciação entre **Administrador** (pode editar/excluir tudo) e **Usuário Comum** (apenas visualiza e gerencia perfil).
 - **Gestão de Perfil:** Edição de dados pessoais e alteração de senha.
 
-###  Gestão de Veículos (CRUD)
+###  Gestão de Veículos (CRUD Principal)
 - **Listagem Dinâmica:** Exibição de veículos com paginação e ordenação (Preço, Ano, Recentes).
 - **Filtros Avançados:** Busca por nome, faixa de preço, ano e quilometragem.
 - **Cadastro Completo:** Upload de imagens, descrição de opcionais e especificações técnicas.
 - **Página de Detalhes:** Visualização aprofundada com carrossel de fotos e link direto para WhatsApp dos vendedores.
+
+###  Gestão de Categorias (CRUD Extra)
+- **Cadastro Rápido:** Adição de novas categorias de veículos (ex: SUV, Sedan, Hatch).
+- **Listagem e Exclusão:** Visualização de todas as categorias cadastradas e opção de remoção.
+- **Integração:** Funcionalidade restrita ao painel administrativo.
 
 ###  Frontend e UI/UX
 - **Design Responsivo:** Layout adaptável para Mobile e Desktop (Bootstrap 5).
@@ -51,10 +56,11 @@ O projeto foi organizado para facilitar a manutenção e escalabilidade:
 
 ```text
 /src
- ├── Controllers/   # Lógica de negócio (Usuario, Veiculo, Auth)
+ ├── Controllers/   # Lógica de negócio (Usuario, Veiculo, Categoria, Auth)
  ├── Models/        # Acesso ao Banco de Dados e Regras
  ├── Views/         # Interfaces (HTML/PHP)
  │    ├── auth/     # Login, Registro, Perfil
+ │    ├── categorias/ # Gestão de Categorias
  │    ├── layouts/  # Cabeçalho e Rodapé reutilizáveis
  │    └── veiculos/ # Listagem, Detalhes e CRUD
 /public
@@ -114,5 +120,3 @@ Estudantes de Engenharia de Computação - IFMG
 
 
 **Rafael Gonçalves Oliveira**
-
-
