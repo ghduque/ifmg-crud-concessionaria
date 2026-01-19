@@ -39,9 +39,14 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow-lg">
                             <li><a class="dropdown-item py-2" href="/perfil"><i class="fas fa-id-card-alt me-2 text-warning"></i> Meu Perfil</a></li>
+                            
                             <?php if ($_SESSION['papel'] === 'admin'): ?>
                                 <li><a class="dropdown-item py-2" href="/veiculos/criar"><i class="fas fa-plus-circle me-2 text-warning"></i> Anunciar Veículo</a></li>
+                                
+                                <li><a class="dropdown-item py-2" href="/categorias"><i class="fas fa-tags me-2 text-warning"></i> Categorias</a></li>
+                                
                             <?php endif; ?>
+                            
                             <li><hr class="dropdown-divider border-secondary"></li>
                             <li><a class="dropdown-item py-2 text-danger fw-bold" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Sair</a></li>
                         </ul>
@@ -72,9 +77,12 @@
         <ul class="navbar-nav gap-2">
             <li class="nav-item"><a class="nav-link text-white fw-bold" href="/veiculos">ESTOQUE</a></li>
             <?php if (isset($_SESSION['usuario_id'])): ?>
+                
                 <?php if ($_SESSION['papel'] === 'admin'): ?>
                     <li class="nav-item"><a class="nav-link text-warning fw-bold" href="/veiculos/criar">ANUNCIAR</a></li>
+                    <li class="nav-item"><a class="nav-link text-warning fw-bold" href="/categorias">CATEGORIAS</a></li>
                 <?php endif; ?>
+                
                 <li class="nav-item"><a class="nav-link text-white fw-bold" href="/perfil">MEU PERFIL</a></li>
                 <li class="nav-item"><a class="nav-link text-danger fw-bold" href="/logout">SAIR</a></li>
             <?php else: ?>
@@ -83,3 +91,5 @@
         </ul>
     </div>
 </div>
+</body>
+</html>

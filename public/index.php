@@ -1,6 +1,16 @@
 <?php
-// Inicia sessão em todas as páginas
-session_start();
+// Inicia sessão em todas as páginas (verifica se já não está iniciada)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// 1. Carrega o arquivo da classe Database
+require_once __DIR__ . '/../config/database.php';
+
+// 2. CRIA A CONEXÃO (A CORREÇÃO ESTÁ AQUI)
+// Instancia a classe que você criou e pega a conexão
+$database = new Database();
+$pdo = $database->getConnection();
 
 // Importa os Controllers
 require_once __DIR__ . '/../src/Controllers/VeiculoController.php';
@@ -89,9 +99,30 @@ switch ($url) {
         $controller->show();
         break;
 
+    // --- ROTAS DE CATEGORIAS (CRUD EXTRA) ---
+    case '/categorias':
+        require_once __DIR__ . '/../src/Controllers/CategoriaController.php';
+        // Agora o $pdo existe porque criamos ele lá em cima!
+        $controller = new CategoriaController($pdo);
+        $controller->index();
+        break;
+
+    case '/categorias/store':
+        require_once __DIR__ . '/../src/Controllers/CategoriaController.php';
+        $controller = new CategoriaController($pdo);
+        $controller->store();
+        break;
+
+    case '/categorias/delete':
+        require_once __DIR__ . '/../src/Controllers/CategoriaController.php';
+        $controller = new CategoriaController($pdo);
+        $controller->delete();
+        break;
+
     default:
         http_response_code(404);
         echo "<h1>404 - Página não encontrada</h1>";
         break;
-}
+        
+    }
 ?>
